@@ -1,0 +1,4 @@
+FROM LIB:c.o "CWork:proj/GetArticle/GetArticle.o"
+TO "CWork:proj/GetArticle/GetArticle"
+LIB LIB:sc.lib LIB:amiga.lib
+
