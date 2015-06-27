@@ -1,0 +1,82 @@
+
+              ####     ##       #####
+              ## ##    ##      ##        © 1994  Kevin Phair
+              ##  ##   ##      ## ###
+              ## ##    ##      ##  ##    fidonet 2:263/150.6
+              ####   # ##### #  #####
+                                         Compiled using DICE
+              F I L E   M A N A G E R             - v2.06.37
+
+                    version 0.9b
+
+
+This is a utility to help in fixing corrupted file listings, and also to
+assist the SysOp in controlling his or her file areas. There are four
+available options in this release of the program:
+
+    o  Give a listing of an area, listing the file numbers, their
+       names and the names of the uploaders. This is useful for
+       checking to see who has been uploading to an area, and what
+       kind of files are there, without having to log on locally.
+
+    o  Save the first 80 characters of the BBS file description 
+       into the file comment. This is useful for SysOps you want
+       keep tape backups and perhaps restore files after an area
+       has been reallocated. This is useful because of DLG's
+       turbo upload option which allows the use of file comments
+       to create the BBS file description.
+
+    o  List the users who are in an area. This is useful for when
+       a user complains about a particular area which they should
+       not have access to (because they're barred, or whatever).
+       This also has possibilities for remote SysOps who could
+       perhaps get regular updates of all the "User.file" access
+       files from the file areas, storing them in appropriate
+       areas of their own drive. This would make it possible for
+       them to see just who has access to what area if it becomes
+       necessary to check.
+
+    *  The most important option, and the reason the program was
+       created in the first place. Occasionally, the "File.dat"
+       database in an area would become corrupt, listing wrongly
+       numbered files, or simply containing garbage (which can 
+       somehow drop a user's carrier: Not good for a SysOp's 
+       reputation!)
+
+
+USING THE PROGRAM:
+~~~~~~~~~~~~~~~~~~
+
+The program is controlled from the CLI. To use it, a file area number
+must be provided, and then some options. For example, "DLGFM 1 -r" would
+rebuild the file listing database in area 1 and set the file pointers in
+that area correctly. This assumes that the files are numbered from 1 to
+the last file with no gaps. A renumber may be required before using this
+option.
+
+Options:
+
+ -r  Rebuild "File.dat" and "Pointers.file" in the specified area
+
+ -c  Comment all files in the specified area which have a #?.fd
+     description file using at most the first 80 characters of the 
+     description. Split lines are joined so that as much as possible 
+     of the description is used.
+
+ -u  List of all the users allowed in the specified area.
+
+ -s  List all the files in the specified area by number, with the
+     uploader's name.
+
+
+Using multiple options may work, i.e. DLGFM 1 -r -c, but I've not really
+tested that bit yet.
+
+
+Mail me with feedback please!
+
+
+Kevin J. Phair.
+
+Sunday the 13th of March 1994.
+
