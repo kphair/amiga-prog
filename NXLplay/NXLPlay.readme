@@ -1,0 +1,30 @@
+Short: NXLPlay 0.9. Play NXL (needs 256-colour WB)
+Uploader: Kev@Scorpio.ie (Kevin Phair)
+Author: Kev@Scorpio.ie (Kevin Phair)
+Type: gfx/misc
+
+Plays NXL audiovisual files (NXLs like CDXL,  but  orientated  towards
+the chunky 256 colour unchained modes of PC VGA cards)
+
+Handles the sound data too. Best results will be obtained  on  a  fast
+Amiga  (this  was  developed  on  an  A3000,  with  a Piccolo Z3 using
+CyberGFX) with a 256-colour chunky Workbench screen (the  player  sits
+in a window on the Workbench screen.)
+
+If you're using EGS, you'd better switch over  to  CyberGFX,  the  EGS
+implementation  of  WriteChunkyPixels  is  far too slow for this to be
+usable.
+
+This is a very beta version (I wrote it over the weekend), and doesn't
+handle all types of NXL graphic layout, but sound seems OK.
+
+To do:
+
+    Make the double-buffered sound playback run as a separate process.
+
+    Optimise the VGA-Chunky-to-Linear-Chunky conversion process (SAS
+    sucks! Why no inline assembly?)
+
+    Perhaps save out a CDXL conversion of the NXL file?
+
+    Keyboard control.
