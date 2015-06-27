@@ -1,0 +1,255 @@
+@database NewsUpdate.guide
+@author "Kevin Phair"
+@(c) "Copyright © 1995 Kevin Phair"
+@$VER: NewsUpdate.guide 2.1 (20.4.95)
+
+    NewsUpdate documentation - AmigaGuide format
+
+@node Main "NewsUpdate AmigaGuide Help"
+
+          NewsUpdate 2.1, © 1994 to 1995 by Kevin J. Phair.
+
+                         FREELY DISTRIBUTABLE
+
+
+                         @{" About NewsUpdate   " LINK About}
+
+                         @{" Special features   " LINK Special}
+
+                         @{" Usage              " LINK Usage}
+
+                         @{" History            " LINK History}
+
+                         @{" Author information " LINK Author}
+
+
+
+
+(This is my first attempt at doing AmigaGuide documentation, so please
+ bear with me...)
+@endnode
+
+@node About "About NewsUpdate"
+
+NewsUpdate  is  an  updated  version  of  my  (previously  unreleased)
+program,   NextUpdate.   I  know  there's  already  a  program  called
+NextUpdate, but that wasn't it (although it did something similar.)
+
+What  my  version  did  was  to  also  strip  out  unnecessary  header
+information  from  articles,  since  the  newsgroups  were  being made
+accessible through the BBS. Stripping out the information  means  that
+there  is less clutter at the top of a news article if it's being read
+online, or if you get it via FIDONet.
+
+@endnode
+
+@node Special "Special Features"
+
+So, here's version 2.1, with a new  name  (NewsUpdate,  in  case  that
+wasn't clear), and the ability to specify names/part-names to look for
+in the From: header, to see if the message should be  killed.  So  now
+you  can  remove bandwidth-wasting posters from your message base, and
+even people like myself who use GRn will benefit, if only in terms  of
+reduced blood pressure.
+
+At some stage, I would hope to add support  for  killing  articles  by
+subject, and perhaps other things too.
+@endnode
+
+@node Usage "Using NewsUpdate"
+
+Usage is pretty simple, the first argument must be a filename, and  it
+must  be  the filename of your active newsgroups file (the one you use
+for NNTPxfer), and then you can follow that up with some options.
+
+
+Memory requirements:
+
+    If you have T: assign to somewhere in RAM:, then you  should  make
+    sure  that  you  have  enough RAM to cope with the largest article
+    that will be processed, or assign T: elsewhere.
+
+    The command template is as follows:
+
+    NewsUpdate @{" Active file " LINK Active @{" QUIET " LINK Quiet} @{" NOISY " LINK Noisy} @{" KILL " LINK Kill} @{" CLEAN " LINK Clean} @{" COLOUR " LINK Colour} @{" NOBIN " LINK NoBin}
+
+    Keywords are not case-sensitive.
+@endnode
+
+@node What is an active file?
+
+The active file is the newsgroup control file that your are using with
+NNTPxfer  (or  similar)  to  transfer news articles. The format should
+typically be along the lines of this:
+
+rec.arts.sf.tv.babylon5 36785 36605 n
+ieie.announce 330 22 n
+ieie.comments 936 181 n
+ieie.help 713 297 n
+ieie.test 349 164 n
+comp.sys.amiga.hardware 14798 14721 n
+comp.sys.amiga.programmer 8723 8693 n
+comp.sys.sinclair 3452 3433 n
+alt.sex.wizards 5619 5603 n
+alt.tv.x-files 29140 29090 n
+alt.tv.melrose-place 7114 7103 n
+
+I.e. lines of "Newsgroup high-pointer low-pointer flag"
+
+You MUST provide an active newsgroup list or  this  program  can't  do
+anything for you.
+@endnode
+
+@node Quiet "Command line options - QUIET"
+
+QUIET
+
+    Will prevent any normal output from cluttering your CLI window  or
+    accidentally opening one up from your script.
+@endnode
+
+@node Noisy "Command line options - NOISY"
+
+NOISY
+
+    Will provide more detailed information  on  what  the  program  is
+    doing  (i.e.  it will list articles as it cleans them, and also as
+    it kills them, if necessary)
+@endnode
+
+@node Kill "Command line options - KILL"
+
+KILL
+
+    Will make the program read in a list of specifiers from  the  file
+    'UULib:KillFile.From'  when  it  starts  up,  and as it scans each
+    article, it will see if any of these specifiers are  contained  in
+    the  From:  header.  If  there  is  a  match,  then the article is
+    deleted. NOTICE that this only needs to find the string WITHIN the
+    From:  line, so you can specify a source address to search for, or
+    even a partial address, e.g.:
+
+    'anewton@alturia' would match posts by user 'anewton'  at  machine
+    'alturia',  in any domain. '@loser.com' would match posts from any
+    user at loser.com. 'Robodude@'  would  match  posts  from  a  user
+    called "Robodude" posting from any site.
+
+    '(Kevin Phair)' would match any of my posts, whether it's me using
+    my own account, or posting from the BBS.
+
+    You can get a bit  of  added  safety,  by  putting  in  the  whole
+    address, and even including the "From: " at the start of the line!
+
+    This is a very powerful option, and you should be as  specific  as
+    possible  in  terms  of origin addresses you want to kill articles
+    from.
+
+@endnode
+
+@node Clean "Command line options - CLEAN"
+
+CLEAN
+
+    This is one of the reasons the program was first written (since an
+    ARexx  script  can  quite happily look after updating those little
+    .next files anyway!)
+
+    What it does is it buffers each article through a  temporary  file
+    in  T:,  and  keeps only the From:, Organi[s|z]ation:, Message-ID,
+    References:, Subject: and Date: fields.  Everything  else  in  the
+    message header is discarded. Once the header has been parsed, then
+    the body of the article is pushed straight through, and  then  the
+    original article is overwritten with the new, leaner article.
+
+    The reason I leave the threading fields in is that I,  or  someone
+    else,  may decide at some stage to convert these to FIDO threading
+    kludges.
+@endnode
+
+@node NoBin "Command line options - NOBIN"
+
+NOBIN
+
+    Will skip any newsgroups with 'binaries'  in  the  name,  so  that
+    large  numbers  of  large  files  will  not be thrashed to-and-fro
+    betweenthe hard disk and RAM, as there is little point  in  making
+    large encoded posts a few lines shorter.
+
+    Note: Using NOBIN will still update the .next pointer!
+@endnode
+
+@node Colour "Command line options - COLOUR"
+
+COLOUR (or COLOR)
+
+    Will enable ANSI colour codes (limits itself to the first four)
+@endnode
+
+@node ReturnCodes "Return Codes"
+
+Return codes:
+
+    The program will return an error code  of  30  if  there  are  any
+    errors, and a return code of 0 if all has gone well.
+@endnode
+
+@node Examples "Examples of usage"
+
+Example usage:
+
+    NewsUpdate UULib:News/Active KILL NOISY COLOUR
+
+        Will scan articles, using killfile to remove  unwanted  posts,
+        and  will  provide a running commentary on what it's doing, as
+        well as putting colour in the output, so you can see things  a
+        bit more clearly.
+
+    NewsUpdate UULib:News/Active QUIET CLEAN NOBIN
+
+        Standard usage for SysOps; No output, trim article headers,
+        don't process articles in any binary newsgroups.
+@endnode
+
+@node Future "Future Prospects"
+
+Future:
+
+    Anyone interested in an option to ARCHIVE posts by certain people,
+    or subjects, into a separate directory, or even run a user-defined
+    command on the articles?
+
+    I think I'll probably  release  the  source  code  with  the  next
+    version.
+@endnode
+
+@node History "NewsUpdate history"
+
+Version 1 has been in use for the last 6  or  7  months  with  no  ill
+effects,  hopefully  this version will be just as reliable.
+
+Version 2.0: Pretty much the same as this version (2.1) but with no
+             colour.
+
+Version 2.1: Fixed bug where it wouldn't update newsgroup with only
+             one new article.
+@endnode
+
+@node Author "Author information"
+
+I've written other stuff, mainly for DLG BBS SysOps:
+
+    DLGFM. Small program to manage simple file area maintenance (i.e.
+    remove orphaned .fd files, rebuild quick file description
+    table...)
+
+    DLG-Edit. Slightly larger program, which provides a GUI interface
+    for editing User records, File/Message areas (names, access
+    levels, import text files to create new areas...)
+
+    Vec (not yet released). Small WB toy which sits in a window
+    displaying shaded rotating 3D polygon-based shapes.
+
+If you find bugs, or have suggestions, then e-mail me at Kev@Scorpio.ie,
+or you can send fido netmail to me at 2:263/150.6
+@endnode
+

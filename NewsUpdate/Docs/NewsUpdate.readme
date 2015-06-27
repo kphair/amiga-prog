@@ -1,0 +1,25 @@
+Short: v2.1. Update .next, w/killfile, clean headers.
+Uploader: Kev@Scorpio.ie (Kevin Phair)
+Author: Kev@Scorpio.ie (Kevin Phair)
+Type: comm/news
+
+As well as updating .next article pointers from an active  file,  this
+little  utility  can also use a killfile to kill articles by poster or
+site (or pretty much anything in the From: field), as well as trimming
+down the size of article headers for easier reading when imported into
+a BBS or other non-newsreader system,
+
+Program options are:
+
+    QUIET    No program output (except errors)
+    NOISY    List articles as they are cleaned/killed
+    KILL     Use UULib:KillFile.From to kill articles
+    CLEAN    Clean article headers
+    NOBIN    Do not clean in 'binaries' newsgroups
+    COLOUR   Use ANSI colour in console output
+
+Normal program activity is to list each newsgroup and the number of
+new articles and then update the .next pointer.
+
+    NewsUpdate - © 1994-1995 Kevin J.Phair (Kev@Scorpio.ie)
+
