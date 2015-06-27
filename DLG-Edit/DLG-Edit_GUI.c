@@ -20,8 +20,6 @@
 #include <clib/graphics_protos.h>
 #include <clib/utility_protos.h>
 #include <string.h>
-#include <clib/diskfont_protos.h>
-
 #include <pragmas/exec_pragmas.h>
 #include <pragmas/intuition_pragmas.h>
 #include <pragmas/gadtools_pragmas.h>
@@ -31,7 +29,7 @@
 #include "DLG-Edit_GUI.h"
 
 struct Screen         *Scr = NULL;
-UBYTE                 *PubScreenName = "Workbench";
+UBYTE                 *PubScreenName = NULL;
 APTR                   VisualInfo = NULL;
 struct Window         *File_Area_ManagerWnd = NULL;
 struct Window         *Message_Area_ManagerWnd = NULL;
@@ -39,12 +37,14 @@ struct Window         *User_EditorWnd = NULL;
 struct Window         *Main_Status_DisplayWnd = NULL;
 struct Window         *FileAreaTemplateWnd = NULL;
 struct Window         *MsgAreaTemplateWnd = NULL;
+struct Window         *FileUserAccessWnd = NULL;
 struct Gadget         *File_Area_ManagerGList = NULL;
 struct Gadget         *Message_Area_ManagerGList = NULL;
 struct Gadget         *User_EditorGList = NULL;
 struct Gadget         *Main_Status_DisplayGList = NULL;
 struct Gadget         *FileAreaTemplateGList = NULL;
 struct Gadget         *MsgAreaTemplateGList = NULL;
+struct Gadget         *FileUserAccessGList = NULL;
 struct Menu           *Main_Status_DisplayMenus = NULL;
 struct IntuiMessage    File_Area_ManagerMsg;
 struct IntuiMessage    Message_Area_ManagerMsg;
@@ -52,1677 +52,1845 @@ struct IntuiMessage    User_EditorMsg;
 struct IntuiMessage    Main_Status_DisplayMsg;
 struct IntuiMessage    FileAreaTemplateMsg;
 struct IntuiMessage    MsgAreaTemplateMsg;
+struct IntuiMessage    FileUserAccessMsg;
 struct Gadget         *File_Area_ManagerGadgets[28];
-struct Gadget         *Message_Area_ManagerGadgets[38];
-struct Gadget         *User_EditorGadgets[58];
+struct Gadget         *Message_Area_ManagerGadgets[36];
+struct Gadget         *User_EditorGadgets[53];
 struct Gadget         *Main_Status_DisplayGadgets[3];
-struct Gadget         *FileAreaTemplateGadgets[5];
-struct Gadget         *MsgAreaTemplateGadgets[5];
-UWORD                  File_Area_ManagerLeft = 34;
-UWORD                  File_Area_ManagerTop = 40;
-UWORD                  File_Area_ManagerWidth = 499;
-UWORD                  File_Area_ManagerHeight = 267;
-UWORD                  Message_Area_ManagerLeft = 42;
-UWORD                  Message_Area_ManagerTop = 26;
-UWORD                  Message_Area_ManagerWidth = 493;
-UWORD                  Message_Area_ManagerHeight = 326;
-UWORD                  User_EditorLeft = 22;
-UWORD                  User_EditorTop = 21;
-UWORD                  User_EditorWidth = 550;
-UWORD                  User_EditorHeight = 381;
-UWORD                  Main_Status_DisplayLeft = 242;
-UWORD                  Main_Status_DisplayTop = 167;
-UWORD                  Main_Status_DisplayWidth = 157;
-UWORD                  Main_Status_DisplayHeight = 110;
-UWORD                  FileAreaTemplateLeft = 24;
-UWORD                  FileAreaTemplateTop = 30;
-UWORD                  FileAreaTemplateWidth = 608;
-UWORD                  FileAreaTemplateHeight = 248;
-UWORD                  MsgAreaTemplateLeft = 24;
-UWORD                  MsgAreaTemplateTop = 30;
-UWORD                  MsgAreaTemplateWidth = 608;
-UWORD                  MsgAreaTemplateHeight = 248;
+struct Gadget         *FileAreaTemplateGadgets[16];
+struct Gadget         *MsgAreaTemplateGadgets[18];
+struct Gadget         *FileUserAccessGadgets[9];
+UWORD                  File_Area_ManagerLeft = 12;
+UWORD                  File_Area_ManagerTop = 28;
+UWORD                  File_Area_ManagerWidth = 560;
+UWORD                  File_Area_ManagerHeight = 222;
+UWORD                  Message_Area_ManagerLeft = 64;
+UWORD                  Message_Area_ManagerTop = 58;
+UWORD                  Message_Area_ManagerWidth = 560;
+UWORD                  Message_Area_ManagerHeight = 347;
+UWORD                  User_EditorLeft = 34;
+UWORD                  User_EditorTop = 22;
+UWORD                  User_EditorWidth = 632;
+UWORD                  User_EditorHeight = 452;
+UWORD                  Main_Status_DisplayLeft = 48;
+UWORD                  Main_Status_DisplayTop = 32;
+UWORD                  Main_Status_DisplayWidth = 200;
+UWORD                  Main_Status_DisplayHeight = 112;
+UWORD                  FileAreaTemplateLeft = 115;
+UWORD                  FileAreaTemplateTop = 145;
+UWORD                  FileAreaTemplateWidth = 624;
+UWORD                  FileAreaTemplateHeight = 297;
+UWORD                  MsgAreaTemplateLeft = 0;
+UWORD                  MsgAreaTemplateTop = 45;
+UWORD                  MsgAreaTemplateWidth = 624;
+UWORD                  MsgAreaTemplateHeight = 312;
+UWORD                  FileUserAccessLeft = 130;
+UWORD                  FileUserAccessTop = 131;
+UWORD                  FileUserAccessWidth = 592;
+UWORD                  FileUserAccessHeight = 402;
 UBYTE                 *File_Area_ManagerWdt = (UBYTE *)"File Area Manager";
 UBYTE                 *Message_Area_ManagerWdt = (UBYTE *)"Message Area Manager";
 UBYTE                 *User_EditorWdt = (UBYTE *)"User Editor";
 UBYTE                 *Main_Status_DisplayWdt = (UBYTE *)"Status";
-UBYTE                 *FileAreaTemplateWdt = (UBYTE *)"Work Window";
-UBYTE                 *MsgAreaTemplateWdt = (UBYTE *)"Work Window";
+UBYTE                 *FileAreaTemplateWdt = (UBYTE *)"Apply File Area Template";
+UBYTE                 *MsgAreaTemplateWdt = (UBYTE *)"Apply Message Area Template";
+UBYTE                 *FileUserAccessWdt = (UBYTE *)"File Area Access";
 struct TextAttr       *Font, Attr;
 UWORD                  FontX, FontY;
 UWORD                  OffX, OffY;
-struct TextFont       *File_Area_ManagerFont = NULL;
-struct TextFont       *Message_Area_ManagerFont = NULL;
-struct TextFont       *User_EditorFont = NULL;
-struct TextFont       *Main_Status_DisplayFont = NULL;
-struct TextFont       *FileAreaTemplateFont = NULL;
-struct TextFont       *MsgAreaTemplateFont = NULL;
 
 UBYTE *FileEnter_low0Labels[] = {
-	(UBYTE *)"1",
-	(UBYTE *)"10",
-	NULL };
+        (UBYTE *)"1",
+        (UBYTE *)"10",
+        NULL };
 
 UBYTE *FileEnter_high0Labels[] = {
-	(UBYTE *)"1",
-	(UBYTE *)"10",
-	NULL };
+        (UBYTE *)"1",
+        (UBYTE *)"10",
+        NULL };
 
 UBYTE *FileKill_low0Labels[] = {
-	(UBYTE *)"1",
-	(UBYTE *)"10",
-	NULL };
+        (UBYTE *)"1",
+        (UBYTE *)"10",
+        NULL };
 
 UBYTE *FileKill_high0Labels[] = {
-	(UBYTE *)"1",
-	(UBYTE *)"10",
-	NULL };
+        (UBYTE *)"1",
+        (UBYTE *)"10",
+        NULL };
 
 UBYTE *FileHurl_low0Labels[] = {
-	(UBYTE *)"1",
-	(UBYTE *)"10",
-	NULL };
+        (UBYTE *)"1",
+        (UBYTE *)"10",
+        NULL };
 
 UBYTE *FileHurl_high0Labels[] = {
-	(UBYTE *)"1",
-	(UBYTE *)"10",
-	NULL };
+        (UBYTE *)"1",
+        (UBYTE *)"10",
+        NULL };
 
 UBYTE *FileUpload_low0Labels[] = {
-	(UBYTE *)"1",
-	(UBYTE *)"10",
-	NULL };
+        (UBYTE *)"1",
+        (UBYTE *)"10",
+        NULL };
 
 UBYTE *FileUpload_high0Labels[] = {
-	(UBYTE *)"1",
-	(UBYTE *)"10",
-	NULL };
+        (UBYTE *)"1",
+        (UBYTE *)"10",
+        NULL };
 
 UBYTE *FileSysOp_low0Labels[] = {
-	(UBYTE *)"1",
-	(UBYTE *)"10",
-	NULL };
+        (UBYTE *)"1",
+        (UBYTE *)"10",
+        NULL };
 
 UBYTE *FileSysOp_high0Labels[] = {
-	(UBYTE *)"1",
-	(UBYTE *)"10",
-	NULL };
+        (UBYTE *)"1",
+        (UBYTE *)"10",
+        NULL };
 
 UBYTE *FileDownload_low0Labels[] = {
-	(UBYTE *)"1",
-	(UBYTE *)"10",
-	NULL };
+        (UBYTE *)"1",
+        (UBYTE *)"10",
+        NULL };
 
 UBYTE *FileDownload_high0Labels[] = {
-	(UBYTE *)"1",
-	(UBYTE *)"10",
-	NULL };
+        (UBYTE *)"1",
+        (UBYTE *)"10",
+        NULL };
 
 UBYTE *MsgEnter_low1Labels[] = {
-	(UBYTE *)"1",
-	(UBYTE *)"10",
-	NULL };
+        (UBYTE *)"1",
+        (UBYTE *)"10",
+        NULL };
 
 UBYTE *MsgEnter_high1Labels[] = {
-	(UBYTE *)"1",
-	(UBYTE *)"10",
-	NULL };
+        (UBYTE *)"1",
+        (UBYTE *)"10",
+        NULL };
 
 UBYTE *MsgWrite_low1Labels[] = {
-	(UBYTE *)"1",
-	(UBYTE *)"10",
-	NULL };
+        (UBYTE *)"1",
+        (UBYTE *)"10",
+        NULL };
 
 UBYTE *MsgWrite_high1Labels[] = {
-	(UBYTE *)"1",
-	(UBYTE *)"10",
-	NULL };
+        (UBYTE *)"1",
+        (UBYTE *)"10",
+        NULL };
 
 UBYTE *MsgKill_low1Labels[] = {
-	(UBYTE *)"1",
-	(UBYTE *)"10",
-	NULL };
+        (UBYTE *)"1",
+        (UBYTE *)"10",
+        NULL };
 
 UBYTE *MsgKill_high1Labels[] = {
-	(UBYTE *)"1",
-	(UBYTE *)"10",
-	NULL };
+        (UBYTE *)"1",
+        (UBYTE *)"10",
+        NULL };
 
 UBYTE *MsgForward_low1Labels[] = {
-	(UBYTE *)"1",
-	(UBYTE *)"10",
-	NULL };
+        (UBYTE *)"1",
+        (UBYTE *)"10",
+        NULL };
 
 UBYTE *MsgForward_high1Labels[] = {
-	(UBYTE *)"1",
-	(UBYTE *)"10",
-	NULL };
+        (UBYTE *)"1",
+        (UBYTE *)"10",
+        NULL };
 
 UBYTE *MsgHurl_low1Labels[] = {
-	(UBYTE *)"1",
-	(UBYTE *)"10",
-	NULL };
+        (UBYTE *)"1",
+        (UBYTE *)"10",
+        NULL };
 
 UBYTE *MsgHurl_high1Labels[] = {
-	(UBYTE *)"1",
-	(UBYTE *)"10",
-	NULL };
+        (UBYTE *)"1",
+        (UBYTE *)"10",
+        NULL };
 
 UBYTE *MsgSysOp_low1Labels[] = {
-	(UBYTE *)"1",
-	(UBYTE *)"10",
-	NULL };
+        (UBYTE *)"1",
+        (UBYTE *)"10",
+        NULL };
 
 UBYTE *MsgSysOp_high1Labels[] = {
-	(UBYTE *)"1",
-	(UBYTE *)"10",
-	NULL };
+        (UBYTE *)"1",
+        (UBYTE *)"10",
+        NULL };
 
 UBYTE *MsgReEdit_low1Labels[] = {
-	(UBYTE *)"1",
-	(UBYTE *)"10",
-	NULL };
+        (UBYTE *)"1",
+        (UBYTE *)"10",
+        NULL };
 
 UBYTE *MsgReEdit_high1Labels[] = {
-	(UBYTE *)"1",
-	(UBYTE *)"10",
-	NULL };
+        (UBYTE *)"1",
+        (UBYTE *)"10",
+        NULL };
 
 UBYTE *MsgSaveCharSet_cycle1Labels[] = {
-	(UBYTE *)"--Default--",
-	(UBYTE *)".",
-	NULL };
+        (UBYTE *)"--Default--",
+        (UBYTE *)".",
+        NULL };
 
 UBYTE *UserTerminal_cycle2Labels[] = {
-	(UBYTE *)"Default",
-	(UBYTE *)".",
-	NULL };
+        (UBYTE *)"Default",
+        (UBYTE *)".",
+        NULL };
 
 UBYTE *UserHelp_cycle2Labels[] = {
-	(UBYTE *)"Intermediate",
-	(UBYTE *)"Novice",
-	(UBYTE *)"Expert",
-	NULL };
+        (UBYTE *)"Intermediate",
+        (UBYTE *)"Novice",
+        (UBYTE *)"Expert",
+        NULL };
 
 UBYTE *UserAccessLevel_cycle2Labels[] = {
-	(UBYTE *)"0",
-	(UBYTE *)".",
-	NULL };
+        (UBYTE *)"0",
+        (UBYTE *)".",
+        NULL };
 
 UBYTE *UserUploadProtocol_cycle2Labels[] = {
-	(UBYTE *)"Default",
-	(UBYTE *)".",
-	NULL };
+        (UBYTE *)"Ask before transfer",
+        (UBYTE *)".",
+        NULL };
 
 UBYTE *UserDownloadProtocol_cycle2Labels[] = {
-	(UBYTE *)"Default",
-	(UBYTE *)".",
-	NULL };
+        (UBYTE *)"Ask before transfer",
+        (UBYTE *)".",
+        NULL };
 
 UBYTE *UserEditor_cycle2Labels[] = {
-	(UBYTE *)"Default",
-	(UBYTE *)"1",
-	NULL };
+        (UBYTE *)"Default",
+        (UBYTE *)".",
+        NULL };
 
 UBYTE *UserCharSet_cycle2Labels[] = {
-	(UBYTE *)"Default",
-	(UBYTE *)".",
-	NULL };
+        (UBYTE *)"Default",
+        (UBYTE *)".",
+        NULL };
 
 UBYTE *UserArchiver_cycle2Labels[] = {
-	(UBYTE *)"Default",
-	(UBYTE *)".",
-	NULL };
+        (UBYTE *)"Default",
+        (UBYTE *)".",
+        NULL };
 
 UBYTE *UserNetmailPriv_cycle2Labels[] = {
-	(UBYTE *)"NONE",
-	(UBYTE *)"User",
-	(UBYTE *)"SysOp",
-	NULL };
+        (UBYTE *)"NONE",
+        (UBYTE *)"User",
+        (UBYTE *)"SysOp",
+        NULL };
 
 UBYTE *UserMenuSet_cycle2Labels[] = {
-	(UBYTE *)"Default",
-	(UBYTE *)"1",
-	NULL };
+        (UBYTE *)"Default",
+        (UBYTE *)".",
+        NULL };
 
 UBYTE *UserUUCPPriv_cycle2Labels[] = {
-	(UBYTE *)"NONE",
-	(UBYTE *)"Client",
-	(UBYTE *)"UseNet",
-	NULL };
+        (UBYTE *)"NONE",
+        (UBYTE *)"Client",
+        (UBYTE *)"UseNet",
+        NULL };
+
+UBYTE *UserFileChooser_cycle2Labels[] = {
+        (UBYTE *)"Files uploaded",
+        (UBYTE *)"Files downloaded",
+        (UBYTE *)"Bytes uploaded",
+        (UBYTE *)"Bytes downloaded",
+        (UBYTE *)"Private limit",
+        (UBYTE *)"File ratio",
+        NULL };
+
+UBYTE *UserMsgChooser_cycle2Labels[] = {
+        (UBYTE *)"Messages read",
+        (UBYTE *)"Messages written",
+        (UBYTE *)"Credit",
+        NULL };
+
+UBYTE *FileUserAccessMX6Labels[] = {
+        (UBYTE *)"Add",
+        (UBYTE *)"Remove",
+        NULL };
+
+extern struct MinList FileArea_listview0List;
+
+struct Node FileArea_listview0Nodes[] = {
+        ( struct Node * )&FileArea_listview0List.mlh_Tail, ( struct Node * )&FileArea_listview0List.mlh_Head, 0, 0, "1234567890123456789012345678901234" };
+
+struct MinList FileArea_listview0List = {
+        ( struct MinNode * )&FileArea_listview0Nodes[0], ( struct MinNode * )NULL, ( struct MinNode * )&FileArea_listview0Nodes[0] };
+
+extern struct MinList UserList_listview2List;
+
+struct Node UserList_listview2Nodes[] = {
+        ( struct Node * )&UserList_listview2List.mlh_Tail, ( struct Node * )&UserList_listview2List.mlh_Head, 0, 0, "123456789012345678901234567890" };
+
+struct MinList UserList_listview2List = {
+        ( struct MinNode * )&UserList_listview2Nodes[0], ( struct MinNode * )NULL, ( struct MinNode * )&UserList_listview2Nodes[0] };
+
+extern struct MinList FileAccessUserSrc_listview6List;
+
+struct Node FileAccessUserSrc_listview6Nodes[] = {
+        ( struct Node * )&FileAccessUserSrc_listview6List.mlh_Tail, ( struct Node * )&FileAccessUserSrc_listview6List.mlh_Head, 0, 0, "123456789012345678901234567890" };
+
+struct MinList FileAccessUserSrc_listview6List = {
+        ( struct MinNode * )&FileAccessUserSrc_listview6Nodes[0], ( struct MinNode * )NULL, ( struct MinNode * )&FileAccessUserSrc_listview6Nodes[0] };
+
+extern struct MinList FileAccessAreaSrc_listview6List;
+
+struct Node FileAccessAreaSrc_listview6Nodes[] = {
+        ( struct Node * )&FileAccessAreaSrc_listview6List.mlh_Tail, ( struct Node * )&FileAccessAreaSrc_listview6List.mlh_Head, 0, 0, "1234567890123456789012345678901234" };
+
+struct MinList FileAccessAreaSrc_listview6List = {
+        ( struct MinNode * )&FileAccessAreaSrc_listview6Nodes[0], ( struct MinNode * )NULL, ( struct MinNode * )&FileAccessAreaSrc_listview6Nodes[0] };
 
 struct IntuiText User_EditorIText[] = {
-	2, 0, JAM2,293, 95, NULL, (UBYTE *)" ANSI Settings:", NULL,
-	2, 0, JAM2,463, 8, NULL, (UBYTE *)" Files Access:", NULL,
-	2, 0, JAM2,463, 136, NULL, (UBYTE *)" Mail access:", NULL,
-	2, 0, JAM2,294, 8, NULL, (UBYTE *)" Misc Flags:", NULL };
+        2, 0, JAM2,348, 113, NULL, (UBYTE *)" ANSI Settings ", NULL,
+        2, 0, JAM2,536, 8, NULL, (UBYTE *)" File Access ", NULL,
+        2, 0, JAM2,348, 8, NULL, (UBYTE *)" Misc Flags ", NULL,
+        2, 0, JAM2,540, 83, NULL, (UBYTE *)" Mail Access ", NULL,
+        2, 0, JAM2,556, 278, NULL, (UBYTE *)" Total ", NULL };
 
-#define User_Editor_TNUM 4
+#define User_Editor_TNUM 5
 
 struct IntuiText Main_Status_DisplayIText[] = {
-	2, 0, JAM1,80, 17, NULL, (UBYTE *)"DLG-Edit 0.9", NULL,
-	1, 0, JAM1,78, 33, NULL, (UBYTE *)"© 1994 Kevin Phair", NULL };
+        2, 0, JAM1,84, 18, NULL, (UBYTE *)"DLG-Edit", NULL,
+        1, 0, JAM1,104, 33, NULL, (UBYTE *)"© 1994 Kevin Phair", NULL };
 
 #define Main_Status_Display_TNUM 2
 
-struct IntuiText FileAreaTemplateIText[] = {
-	1, 0, JAM1,139, 10, NULL, (UBYTE *)"Available Areas (Click in here to Select)", NULL,
-	1, 0, JAM1,447, 10, NULL, (UBYTE *)"Areas to Template (Click in here to Deselect)", NULL };
-
-#define FileAreaTemplate_TNUM 2
-
-struct IntuiText MsgAreaTemplateIText[] = {
-	1, 0, JAM1,139, 10, NULL, (UBYTE *)"Available Areas (Click in here to Select)", NULL,
-	1, 0, JAM1,447, 10, NULL, (UBYTE *)"Areas to Template (Click in here to Deselect)", NULL };
-
-#define MsgAreaTemplate_TNUM 2
-
 struct NewMenu Main_Status_DisplayNewMenu[] = {
-	NM_TITLE, (STRPTR)"Project", NULL, 0, NULL, NULL,
-	NM_ITEM, (STRPTR)"About", NULL, 0, 0L, (APTR)Main_Status_DisplayItem0,
-	NM_ITEM, (STRPTR)NM_BARLABEL, NULL, 0, 0L, NULL,
-	NM_ITEM, (STRPTR)"Quit", NULL, 0, 0L, (APTR)Main_Status_DisplayItem1,
-	NM_END, NULL, NULL, 0, 0L, NULL };
+        NM_TITLE, (STRPTR)"Project", NULL, 0, NULL, NULL,
+        NM_ITEM, (STRPTR)"About", NULL, 0, 0L, (APTR)Main_Status_DisplayItem0,
+        NM_ITEM, (STRPTR)NM_BARLABEL, NULL, 0, 0L, NULL,
+        NM_ITEM, (STRPTR)"Quit", NULL, 0, 0L, (APTR)Main_Status_DisplayItem1,
+        NM_END, NULL, NULL, 0, 0L, NULL };
 
 UWORD File_Area_ManagerGTypes[] = {
-	LISTVIEW_KIND,
-	BUTTON_KIND,
-	BUTTON_KIND,
-	BUTTON_KIND,
-	CHECKBOX_KIND,
-	CHECKBOX_KIND,
-	CHECKBOX_KIND,
-	CYCLE_KIND,
-	CYCLE_KIND,
-	CYCLE_KIND,
-	CYCLE_KIND,
-	CYCLE_KIND,
-	CYCLE_KIND,
-	CYCLE_KIND,
-	CYCLE_KIND,
-	CYCLE_KIND,
-	CYCLE_KIND,
-	CYCLE_KIND,
-	CYCLE_KIND,
-	BUTTON_KIND,
-	BUTTON_KIND,
-	BUTTON_KIND,
-	BUTTON_KIND,
-	STRING_KIND,
-	INTEGER_KIND,
-	STRING_KIND,
-	INTEGER_KIND,
-	BUTTON_KIND
+        LISTVIEW_KIND,
+        BUTTON_KIND,
+        BUTTON_KIND,
+        BUTTON_KIND,
+        CHECKBOX_KIND,
+        CHECKBOX_KIND,
+        CHECKBOX_KIND,
+        CYCLE_KIND,
+        CYCLE_KIND,
+        CYCLE_KIND,
+        CYCLE_KIND,
+        CYCLE_KIND,
+        CYCLE_KIND,
+        CYCLE_KIND,
+        CYCLE_KIND,
+        CYCLE_KIND,
+        CYCLE_KIND,
+        CYCLE_KIND,
+        CYCLE_KIND,
+        BUTTON_KIND,
+        BUTTON_KIND,
+        BUTTON_KIND,
+        BUTTON_KIND,
+        STRING_KIND,
+        INTEGER_KIND,
+        STRING_KIND,
+        INTEGER_KIND,
+        BUTTON_KIND
 };
 
 UWORD Message_Area_ManagerGTypes[] = {
-	LISTVIEW_KIND,
-	BUTTON_KIND,
-	BUTTON_KIND,
-	BUTTON_KIND,
-	CHECKBOX_KIND,
-	CHECKBOX_KIND,
-	CHECKBOX_KIND,
-	CHECKBOX_KIND,
-	CHECKBOX_KIND,
-	CHECKBOX_KIND,
-	SLIDER_KIND,
-	SLIDER_KIND,
-	CYCLE_KIND,
-	CYCLE_KIND,
-	CYCLE_KIND,
-	CYCLE_KIND,
-	CYCLE_KIND,
-	CYCLE_KIND,
-	CYCLE_KIND,
-	CYCLE_KIND,
-	CYCLE_KIND,
-	CYCLE_KIND,
-	CYCLE_KIND,
-	CYCLE_KIND,
-	CYCLE_KIND,
-	CYCLE_KIND,
-	BUTTON_KIND,
-	BUTTON_KIND,
-	BUTTON_KIND,
-	CYCLE_KIND,
-	BUTTON_KIND,
-	STRING_KIND,
-	INTEGER_KIND,
-	STRING_KIND,
-	INTEGER_KIND,
-	INTEGER_KIND,
-	STRING_KIND,
-	BUTTON_KIND
+        LISTVIEW_KIND,
+        BUTTON_KIND,
+        BUTTON_KIND,
+        BUTTON_KIND,
+        CHECKBOX_KIND,
+        CHECKBOX_KIND,
+        CHECKBOX_KIND,
+        CHECKBOX_KIND,
+        CHECKBOX_KIND,
+        CHECKBOX_KIND,
+        CYCLE_KIND,
+        CYCLE_KIND,
+        CYCLE_KIND,
+        CYCLE_KIND,
+        CYCLE_KIND,
+        CYCLE_KIND,
+        CYCLE_KIND,
+        CYCLE_KIND,
+        CYCLE_KIND,
+        CYCLE_KIND,
+        CYCLE_KIND,
+        CYCLE_KIND,
+        CYCLE_KIND,
+        CYCLE_KIND,
+        BUTTON_KIND,
+        BUTTON_KIND,
+        BUTTON_KIND,
+        CYCLE_KIND,
+        BUTTON_KIND,
+        STRING_KIND,
+        INTEGER_KIND,
+        STRING_KIND,
+        INTEGER_KIND,
+        INTEGER_KIND,
+        STRING_KIND,
+        BUTTON_KIND
 };
 
 UWORD User_EditorGTypes[] = {
-	LISTVIEW_KIND,
-	CYCLE_KIND,
-	CYCLE_KIND,
-	CHECKBOX_KIND,
-	CYCLE_KIND,
-	CHECKBOX_KIND,
-	CHECKBOX_KIND,
-	CHECKBOX_KIND,
-	CHECKBOX_KIND,
-	CHECKBOX_KIND,
-	CHECKBOX_KIND,
-	CHECKBOX_KIND,
-	CHECKBOX_KIND,
-	CYCLE_KIND,
-	CYCLE_KIND,
-	CHECKBOX_KIND,
-	CYCLE_KIND,
-	CYCLE_KIND,
-	CYCLE_KIND,
-	CYCLE_KIND,
-	CYCLE_KIND,
-	BUTTON_KIND,
-	BUTTON_KIND,
-	BUTTON_KIND,
-	CYCLE_KIND,
-	BUTTON_KIND,
-	STRING_KIND,
-	STRING_KIND,
-	STRING_KIND,
-	INTEGER_KIND,
-	INTEGER_KIND,
-	CHECKBOX_KIND,
-	STRING_KIND,
-	STRING_KIND,
-	STRING_KIND,
-	STRING_KIND,
-	STRING_KIND,
-	STRING_KIND,
-	STRING_KIND,
-	STRING_KIND,
-	STRING_KIND,
-	INTEGER_KIND,
-	INTEGER_KIND,
-	INTEGER_KIND,
-	INTEGER_KIND,
-	INTEGER_KIND,
-	INTEGER_KIND,
-	INTEGER_KIND,
-	INTEGER_KIND,
-	INTEGER_KIND,
-	INTEGER_KIND,
-	INTEGER_KIND,
-	INTEGER_KIND,
-	INTEGER_KIND,
-	INTEGER_KIND,
-	INTEGER_KIND,
-	INTEGER_KIND,
-	INTEGER_KIND
+        LISTVIEW_KIND,
+        CYCLE_KIND,
+        CYCLE_KIND,
+        CHECKBOX_KIND,
+        CYCLE_KIND,
+        CHECKBOX_KIND,
+        CHECKBOX_KIND,
+        CHECKBOX_KIND,
+        CHECKBOX_KIND,
+        CHECKBOX_KIND,
+        CHECKBOX_KIND,
+        CHECKBOX_KIND,
+        CHECKBOX_KIND,
+        CYCLE_KIND,
+        CYCLE_KIND,
+        CHECKBOX_KIND,
+        CYCLE_KIND,
+        CYCLE_KIND,
+        CYCLE_KIND,
+        CYCLE_KIND,
+        CYCLE_KIND,
+        BUTTON_KIND,
+        BUTTON_KIND,
+        BUTTON_KIND,
+        CYCLE_KIND,
+        BUTTON_KIND,
+        STRING_KIND,
+        STRING_KIND,
+        STRING_KIND,
+        INTEGER_KIND,
+        INTEGER_KIND,
+        CHECKBOX_KIND,
+        STRING_KIND,
+        STRING_KIND,
+        STRING_KIND,
+        STRING_KIND,
+        STRING_KIND,
+        STRING_KIND,
+        STRING_KIND,
+        STRING_KIND,
+        STRING_KIND,
+        INTEGER_KIND,
+        INTEGER_KIND,
+        INTEGER_KIND,
+        INTEGER_KIND,
+        INTEGER_KIND,
+        INTEGER_KIND,
+        INTEGER_KIND,
+        INTEGER_KIND,
+        INTEGER_KIND,
+        INTEGER_KIND,
+        CYCLE_KIND,
+        CYCLE_KIND
 };
 
 UWORD Main_Status_DisplayGTypes[] = {
-	BUTTON_KIND,
-	BUTTON_KIND,
-	BUTTON_KIND
+        BUTTON_KIND,
+        BUTTON_KIND,
+        BUTTON_KIND
 };
 
 UWORD FileAreaTemplateGTypes[] = {
-	LISTVIEW_KIND,
-	LISTVIEW_KIND,
-	BUTTON_KIND,
-	BUTTON_KIND,
-	CHECKBOX_KIND
+        LISTVIEW_KIND,
+        LISTVIEW_KIND,
+        BUTTON_KIND,
+        BUTTON_KIND,
+        CHECKBOX_KIND,
+        CHECKBOX_KIND,
+        CHECKBOX_KIND,
+        CHECKBOX_KIND,
+        CHECKBOX_KIND,
+        CHECKBOX_KIND,
+        CHECKBOX_KIND,
+        CHECKBOX_KIND,
+        CHECKBOX_KIND,
+        CHECKBOX_KIND,
+        CHECKBOX_KIND,
+        CHECKBOX_KIND
 };
 
 UWORD MsgAreaTemplateGTypes[] = {
-	LISTVIEW_KIND,
-	LISTVIEW_KIND,
-	BUTTON_KIND,
-	BUTTON_KIND,
-	CHECKBOX_KIND
+        LISTVIEW_KIND,
+        LISTVIEW_KIND,
+        BUTTON_KIND,
+        BUTTON_KIND,
+        CHECKBOX_KIND,
+        CHECKBOX_KIND,
+        CHECKBOX_KIND,
+        CHECKBOX_KIND,
+        CHECKBOX_KIND,
+        CHECKBOX_KIND,
+        CHECKBOX_KIND,
+        CHECKBOX_KIND,
+        CHECKBOX_KIND,
+        CHECKBOX_KIND,
+        CHECKBOX_KIND,
+        CHECKBOX_KIND,
+        CHECKBOX_KIND,
+        CHECKBOX_KIND
+};
+
+UWORD FileUserAccessGTypes[] = {
+        LISTVIEW_KIND,
+        LISTVIEW_KIND,
+        LISTVIEW_KIND,
+        LISTVIEW_KIND,
+        BUTTON_KIND,
+        BUTTON_KIND,
+        TEXT_KIND,
+        TEXT_KIND,
+        MX_KIND
 };
 
 struct NewGadget File_Area_ManagerNGad[] = {
-	213, 4, 281, 250, NULL, NULL, GD_FileArea_listview, 0, NULL, (APTR)FileArea_listviewClicked,
-	140, 232, 65, 15, (UBYTE *)"Users", NULL, GD_FileAreaUsers_button, PLACETEXT_IN, NULL, (APTR)FileAreaUsers_buttonClicked,
-	140, 215, 65, 15, (UBYTE *)"Remove", NULL, GD_RemoveFileArea_button, PLACETEXT_IN, NULL, (APTR)RemoveFileArea_buttonClicked,
-	140, 198, 65, 15, (UBYTE *)"Insert", NULL, GD_InsertFileArea_button, PLACETEXT_IN, NULL, (APTR)InsertFileArea_buttonClicked,
-	89, 131, 26, 11, (UBYTE *)"F'reqable", NULL, GD_FileFreq_checkbox, PLACETEXT_LEFT, NULL, (APTR)FileFreq_checkboxClicked,
-	89, 161, 26, 11, (UBYTE *)"Validation", NULL, GD_FileValidation_checkbox, PLACETEXT_LEFT, NULL, (APTR)FileValidation_checkboxClicked,
-	89, 145, 26, 11, (UBYTE *)"Signature", NULL, GD_FileSignature_checkbox, PLACETEXT_LEFT, NULL, (APTR)FileSignature_checkboxClicked,
-	70, 4, 53, 14, (UBYTE *)"Access:", NULL, GD_FileEnter_low, PLACETEXT_LEFT, NULL, (APTR)FileEnter_lowClicked,
-	152, 4, 53, 14, (UBYTE *)"to", NULL, GD_FileEnter_high, PLACETEXT_LEFT, NULL, (APTR)FileEnter_highClicked,
-	70, 84, 53, 14, (UBYTE *)"Kill:", NULL, GD_FileKill_low, PLACETEXT_LEFT, NULL, (APTR)FileKill_lowClicked,
-	152, 84, 53, 14, (UBYTE *)"to", NULL, GD_FileKill_high, PLACETEXT_LEFT, NULL, (APTR)FileKill_highClicked,
-	70, 64, 53, 14, (UBYTE *)"Transfer:", NULL, GD_FileHurl_low, PLACETEXT_LEFT, NULL, (APTR)FileHurl_lowClicked,
-	152, 64, 53, 14, (UBYTE *)"to", NULL, GD_FileHurl_high, PLACETEXT_LEFT, NULL, (APTR)FileHurl_highClicked,
-	70, 24, 53, 14, (UBYTE *)"Upload:", NULL, GD_FileUpload_low, PLACETEXT_LEFT, NULL, (APTR)FileUpload_lowClicked,
-	152, 24, 53, 14, (UBYTE *)"to", NULL, GD_FileUpload_high, PLACETEXT_LEFT, NULL, (APTR)FileUpload_highClicked,
-	70, 104, 53, 14, (UBYTE *)"SysOp:", NULL, GD_FileSysOp_low, PLACETEXT_LEFT, NULL, (APTR)FileSysOp_lowClicked,
-	152, 104, 53, 14, (UBYTE *)"to", NULL, GD_FileSysOp_high, PLACETEXT_LEFT, NULL, (APTR)FileSysOp_highClicked,
-	70, 44, 53, 14, (UBYTE *)"Download:", NULL, GD_FileDownload_low, PLACETEXT_LEFT, NULL, (APTR)FileDownload_lowClicked,
-	152, 44, 53, 14, (UBYTE *)"to", NULL, GD_FileDownload_high, PLACETEXT_LEFT, NULL, (APTR)FileDownload_highClicked,
-	140, 145, 65, 15, (UBYTE *)"_Up", NULL, GD_FileAreaUp_button, PLACETEXT_IN, NULL, (APTR)FileAreaUp_buttonClicked,
-	140, 163, 65, 15, (UBYTE *)"_Down", NULL, GD_FileAreaDown_button, PLACETEXT_IN, NULL, (APTR)FileAreaDown_buttonClicked,
-	14, 200, 105, 24, (UBYTE *)"Save", NULL, GD_FileAreaSave_button, PLACETEXT_IN, NULL, (APTR)FileAreaSave_buttonClicked,
-	140, 249, 65, 15, (UBYTE *)"Template", NULL, GD_FileApplyTemplate_button, PLACETEXT_IN, NULL, (APTR)FileApplyTemplate_buttonClicked,
-	258, 249, 236, 15, NULL, NULL, GD_FileAreaName_string, 0, NULL, (APTR)FileAreaName_stringClicked,
-	213, 249, 45, 15, NULL, NULL, GD_FileAreaNumber, 0, NULL, (APTR)FileAreaNumberClicked,
-	67, 249, 57, 15, (UBYTE *)"Path:", NULL, GD_FileAltFilePath_string, PLACETEXT_LEFT, NULL, (APTR)FileAltFilePath_stringClicked,
-	62, 176, 53, 15, (UBYTE *)"Area", NULL, GD_FileValidationArea_integer, PLACETEXT_LEFT, NULL, (APTR)FileValidationArea_integerClicked,
-	10, 230, 113, 16, (UBYTE *)"Import From File", NULL, GD_FileImportAreas_button, PLACETEXT_IN, NULL, (APTR)FileImportAreas_buttonClicked
+        260, 66, 297, 150, NULL, NULL, GD_FileArea_listview, 0, NULL, (APTR)FileArea_listviewClicked,
+        468, 6, 89, 16, (UBYTE *)"Users", NULL, GD_FileAreaUsers_button, PLACETEXT_IN, NULL, (APTR)FileAreaUsers_buttonClicked,
+        364, 26, 89, 16, (UBYTE *)"Remove", NULL, GD_RemoveFileArea_button, PLACETEXT_IN, NULL, (APTR)RemoveFileArea_buttonClicked,
+        364, 6, 89, 16, (UBYTE *)"Insert", NULL, GD_InsertFileArea_button, PLACETEXT_IN, NULL, (APTR)InsertFileArea_buttonClicked,
+        12, 136, 26, 11, (UBYTE *)"F'reqable", NULL, GD_FileFreq_checkbox, PLACETEXT_RIGHT, NULL, (APTR)FileFreq_checkboxClicked,
+        12, 176, 26, 11, (UBYTE *)"Validation", NULL, GD_FileValidation_checkbox, PLACETEXT_RIGHT, NULL, (APTR)FileValidation_checkboxClicked,
+        12, 156, 26, 11, (UBYTE *)"Signature", NULL, GD_FileSignature_checkbox, PLACETEXT_RIGHT, NULL, (APTR)FileSignature_checkboxClicked,
+        88, 6, 65, 16, (UBYTE *)"Access", NULL, GD_FileEnter_low, PLACETEXT_LEFT, NULL, (APTR)FileEnter_lowClicked,
+        188, 6, 65, 16, (UBYTE *)"to", NULL, GD_FileEnter_high, PLACETEXT_LEFT, NULL, (APTR)FileEnter_highClicked,
+        88, 86, 65, 16, (UBYTE *)"Kill", NULL, GD_FileKill_low, PLACETEXT_LEFT, NULL, (APTR)FileKill_lowClicked,
+        188, 86, 65, 16, (UBYTE *)"to", NULL, GD_FileKill_high, PLACETEXT_LEFT, NULL, (APTR)FileKill_highClicked,
+        88, 66, 65, 16, (UBYTE *)"Transfer", NULL, GD_FileHurl_low, PLACETEXT_LEFT, NULL, (APTR)FileHurl_lowClicked,
+        188, 66, 65, 16, (UBYTE *)"to", NULL, GD_FileHurl_high, PLACETEXT_LEFT, NULL, (APTR)FileHurl_highClicked,
+        88, 26, 65, 16, (UBYTE *)"Upload", NULL, GD_FileUpload_low, PLACETEXT_LEFT, NULL, (APTR)FileUpload_lowClicked,
+        188, 26, 65, 16, (UBYTE *)"to", NULL, GD_FileUpload_high, PLACETEXT_LEFT, NULL, (APTR)FileUpload_highClicked,
+        88, 106, 65, 16, (UBYTE *)"SysOp", NULL, GD_FileSysOp_low, PLACETEXT_LEFT, NULL, (APTR)FileSysOp_lowClicked,
+        188, 106, 65, 16, (UBYTE *)"to", NULL, GD_FileSysOp_high, PLACETEXT_LEFT, NULL, (APTR)FileSysOp_highClicked,
+        88, 46, 65, 16, (UBYTE *)"Download", NULL, GD_FileDownload_low, PLACETEXT_LEFT, NULL, (APTR)FileDownload_lowClicked,
+        188, 46, 65, 16, (UBYTE *)"to", NULL, GD_FileDownload_high, PLACETEXT_LEFT, NULL, (APTR)FileDownload_highClicked,
+        260, 6, 89, 16, (UBYTE *)"_Up", NULL, GD_FileAreaUp_button, PLACETEXT_IN, NULL, (APTR)FileAreaUp_buttonClicked,
+        260, 26, 89, 16, (UBYTE *)"_Down", NULL, GD_FileAreaDown_button, PLACETEXT_IN, NULL, (APTR)FileAreaDown_buttonClicked,
+        156, 131, 97, 26, (UBYTE *)"Save", NULL, GD_FileAreaSave_button, PLACETEXT_IN, NULL, (APTR)FileAreaSave_buttonClicked,
+        468, 26, 89, 16, (UBYTE *)"Template", NULL, GD_FileApplyTemplate_button, PLACETEXT_IN, NULL, (APTR)FileApplyTemplate_buttonClicked,
+        324, 46, 233, 17, NULL, NULL, GD_FileAreaName_string, 0, NULL, (APTR)FileAreaName_stringClicked,
+        260, 46, 57, 17, NULL, NULL, GD_FileAreaNumber, 0, NULL, (APTR)FileAreaNumberClicked,
+        164, 201, 81, 17, (UBYTE *)"Path:", NULL, GD_FileAltFilePath_string, PLACETEXT_ABOVE, NULL, (APTR)FileAltFilePath_stringClicked,
+        56, 196, 57, 17, (UBYTE *)"Area", NULL, GD_FileValidationArea_integer, PLACETEXT_LEFT, NULL, (APTR)FileValidationArea_integerClicked,
+        156, 161, 97, 21, (UBYTE *)"Import...", NULL, GD_FileImportAreas_button, PLACETEXT_IN, NULL, (APTR)FileImportAreas_buttonClicked
 };
 
 struct NewGadget Message_Area_ManagerNGad[] = {
-	220, 4, 269, 250, NULL, NULL, GD_MsgArea_listview, 0, NULL, (APTR)MsgArea_listviewClicked,
-	142, 230, 69, 15, (UBYTE *)"Users", NULL, GD_MsgAreaUsers_button, PLACETEXT_IN, NULL, (APTR)MsgAreaUsers_buttonClicked,
-	142, 212, 69, 15, (UBYTE *)"Remove", NULL, GD_RemoveMsgArea_button, PLACETEXT_IN, NULL, (APTR)RemoveMsgArea_buttonClicked,
-	142, 194, 69, 15, (UBYTE *)"Insert", NULL, GD_InsertMsgArea_button, PLACETEXT_IN, NULL, (APTR)InsertMsgArea_buttonClicked,
-	99, 125, 26, 11, (UBYTE *)"SEEN-BY:", NULL, GD_MsgSeenBy_check, PLACETEXT_LEFT, NULL, (APTR)MsgSeenBy_checkClicked,
-	99, 139, 26, 11, (UBYTE *)"Handles:", NULL, GD_MsgHandles_check, PLACETEXT_LEFT, NULL, (APTR)MsgHandles_checkClicked,
-	99, 153, 26, 11, (UBYTE *)"Signatures:", NULL, GD_MsgSignatures_check, PLACETEXT_LEFT, NULL, (APTR)MsgSignatures_checkClicked,
-	99, 165, 26, 11, (UBYTE *)"Echomail:", NULL, GD_MsgEchomail_check, PLACETEXT_LEFT, NULL, (APTR)MsgEchomail_checkClicked,
-	99, 179, 26, 11, (UBYTE *)"Netmail:", NULL, GD_MsgNetmail_check, PLACETEXT_LEFT, NULL, (APTR)MsgNetmail_checkClicked,
-	99, 193, 26, 11, (UBYTE *)"UseNet:", NULL, GD_MsgUseNet_check, PLACETEXT_LEFT, NULL, (APTR)MsgUseNet_checkClicked,
-	301, 290, 146, 13, (UBYTE *)"Capacity:", NULL, GD_MsgCapacity_slider, PLACETEXT_LEFT, NULL, (APTR)MsgCapacity_sliderClicked,
-	301, 307, 146, 13, (UBYTE *)"Renumber at:", NULL, GD_MsgRenumber_slider, PLACETEXT_LEFT, NULL, (APTR)MsgRenumber_sliderClicked,
-	78, 4, 53, 14, (UBYTE *)"Access:", NULL, GD_MsgEnter_low, PLACETEXT_LEFT, NULL, (APTR)MsgEnter_lowClicked,
-	158, 4, 53, 14, (UBYTE *)"to", NULL, GD_MsgEnter_high, PLACETEXT_LEFT, NULL, (APTR)MsgEnter_highClicked,
-	78, 20, 53, 14, (UBYTE *)"Write:", NULL, GD_MsgWrite_low, PLACETEXT_LEFT, NULL, (APTR)MsgWrite_lowClicked,
-	158, 20, 53, 14, (UBYTE *)"to", NULL, GD_MsgWrite_high, PLACETEXT_LEFT, NULL, (APTR)MsgWrite_highClicked,
-	78, 36, 53, 14, (UBYTE *)"Kill:", NULL, GD_MsgKill_low, PLACETEXT_LEFT, NULL, (APTR)MsgKill_lowClicked,
-	158, 36, 53, 14, (UBYTE *)"to", NULL, GD_MsgKill_high, PLACETEXT_LEFT, NULL, (APTR)MsgKill_highClicked,
-	78, 53, 53, 14, (UBYTE *)"Forward:", NULL, GD_MsgForward_low, PLACETEXT_LEFT, NULL, (APTR)MsgForward_lowClicked,
-	158, 53, 53, 14, (UBYTE *)"to", NULL, GD_MsgForward_high, PLACETEXT_LEFT, NULL, (APTR)MsgForward_highClicked,
-	78, 69, 53, 14, (UBYTE *)"Copy:", NULL, GD_MsgHurl_low, PLACETEXT_LEFT, NULL, (APTR)MsgHurl_lowClicked,
-	158, 69, 53, 14, (UBYTE *)"to", NULL, GD_MsgHurl_high, PLACETEXT_LEFT, NULL, (APTR)MsgHurl_highClicked,
-	78, 102, 53, 14, (UBYTE *)"SysOp:", NULL, GD_MsgSysOp_low, PLACETEXT_LEFT, NULL, (APTR)MsgSysOp_lowClicked,
-	158, 102, 53, 14, (UBYTE *)"to", NULL, GD_MsgSysOp_high, PLACETEXT_LEFT, NULL, (APTR)MsgSysOp_highClicked,
-	78, 85, 53, 14, (UBYTE *)"Re-Edit:", NULL, GD_MsgReEdit_low, PLACETEXT_LEFT, NULL, (APTR)MsgReEdit_lowClicked,
-	158, 85, 53, 14, (UBYTE *)"to", NULL, GD_MsgReEdit_high, PLACETEXT_LEFT, NULL, (APTR)MsgReEdit_highClicked,
-	142, 139, 69, 15, (UBYTE *)"_Up", NULL, GD_MsgAreaUp_button, PLACETEXT_IN, NULL, (APTR)MsgAreaUp_buttonClicked,
-	142, 156, 69, 15, (UBYTE *)"_Down", NULL, GD_MsgAreaDown_button, PLACETEXT_IN, NULL, (APTR)MsgAreaDown_buttonClicked,
-	24, 216, 101, 27, (UBYTE *)"SAVE", NULL, GD_MsgAreaSave_button, PLACETEXT_IN, NULL, (APTR)MsgAreaSave_buttonClicked,
-	98, 288, 113, 14, (UBYTE *)"Char Set:", NULL, GD_MsgSaveCharSet_cycle, PLACETEXT_LEFT, NULL, (APTR)MsgSaveCharSet_cycleClicked,
-	142, 248, 69, 15, (UBYTE *)"Template", NULL, GD_MsgApplyTemplate_button, PLACETEXT_IN, NULL, (APTR)MsgApplyTemplate_buttonClicked,
-	265, 248, 224, 15, NULL, NULL, GD_MsgAreaName_string, 0, NULL, (APTR)MsgAreaName_stringClicked,
-	220, 248, 45, 15, NULL, NULL, GD_MsgAreaNumber_integer, 0, NULL, (APTR)MsgAreaNumber_integerClicked,
-	98, 305, 113, 15, (UBYTE *)"Translator:", NULL, GD_MsgTranslator_string, PLACETEXT_LEFT, NULL, (APTR)MsgTranslator_stringClicked,
-	448, 289, 41, 15, NULL, NULL, GD_MsgCapacity_integer, 0, NULL, (APTR)MsgCapacity_integerClicked,
-	448, 306, 41, 15, NULL, NULL, GD_MsgRenumber_integer, 0, NULL, (APTR)MsgRenumber_integerClicked,
-	118, 268, 371, 15, (UBYTE *)"Origin/Newsgroup:", NULL, GD_MsgCustomOrigin_string, PLACETEXT_LEFT, NULL, (APTR)MsgCustomOrigin_stringClicked,
-	20, 249, 109, 15, (UBYTE *)"Import From File", NULL, GD_MsgImportAreas_button, PLACETEXT_IN, NULL, (APTR)MsgImportAreas_buttonClicked
+        260, 66, 297, 260, NULL, NULL, GD_MsgArea_listview, 0, NULL, (APTR)MsgArea_listviewClicked,
+        468, 6, 89, 16, (UBYTE *)"Users", NULL, GD_MsgAreaUsers_button, PLACETEXT_IN, NULL, (APTR)MsgAreaUsers_buttonClicked,
+        364, 26, 89, 16, (UBYTE *)"Remove", NULL, GD_RemoveMsgArea_button, PLACETEXT_IN, NULL, (APTR)RemoveMsgArea_buttonClicked,
+        364, 6, 89, 16, (UBYTE *)"Insert", NULL, GD_InsertMsgArea_button, PLACETEXT_IN, NULL, (APTR)InsertMsgArea_buttonClicked,
+        16, 156, 26, 11, (UBYTE *)"SEEN-BY", NULL, GD_MsgSeenBy_check, PLACETEXT_RIGHT, NULL, (APTR)MsgSeenBy_checkClicked,
+        16, 171, 26, 11, (UBYTE *)"Handles", NULL, GD_MsgHandles_check, PLACETEXT_RIGHT, NULL, (APTR)MsgHandles_checkClicked,
+        16, 186, 26, 11, (UBYTE *)"Signatures", NULL, GD_MsgSignatures_check, PLACETEXT_RIGHT, NULL, (APTR)MsgSignatures_checkClicked,
+        16, 201, 26, 11, (UBYTE *)"Echomail", NULL, GD_MsgEchomail_check, PLACETEXT_RIGHT, NULL, (APTR)MsgEchomail_checkClicked,
+        16, 216, 26, 11, (UBYTE *)"Netmail", NULL, GD_MsgNetmail_check, PLACETEXT_RIGHT, NULL, (APTR)MsgNetmail_checkClicked,
+        16, 231, 26, 11, (UBYTE *)"Usenet", NULL, GD_MsgUseNet_check, PLACETEXT_RIGHT, NULL, (APTR)MsgUseNet_checkClicked,
+        84, 6, 65, 16, (UBYTE *)"Access", NULL, GD_MsgEnter_low, PLACETEXT_LEFT, NULL, (APTR)MsgEnter_lowClicked,
+        184, 6, 65, 16, (UBYTE *)"to", NULL, GD_MsgEnter_high, PLACETEXT_LEFT, NULL, (APTR)MsgEnter_highClicked,
+        84, 26, 65, 16, (UBYTE *)"Write", NULL, GD_MsgWrite_low, PLACETEXT_LEFT, NULL, (APTR)MsgWrite_lowClicked,
+        184, 26, 65, 16, (UBYTE *)"to", NULL, GD_MsgWrite_high, PLACETEXT_LEFT, NULL, (APTR)MsgWrite_highClicked,
+        84, 46, 65, 16, (UBYTE *)"Kill", NULL, GD_MsgKill_low, PLACETEXT_LEFT, NULL, (APTR)MsgKill_lowClicked,
+        184, 46, 65, 16, (UBYTE *)"to", NULL, GD_MsgKill_high, PLACETEXT_LEFT, NULL, (APTR)MsgKill_highClicked,
+        84, 66, 65, 16, (UBYTE *)"Forward", NULL, GD_MsgForward_low, PLACETEXT_LEFT, NULL, (APTR)MsgForward_lowClicked,
+        184, 66, 65, 16, (UBYTE *)"to", NULL, GD_MsgForward_high, PLACETEXT_LEFT, NULL, (APTR)MsgForward_highClicked,
+        84, 86, 65, 16, (UBYTE *)"Copy", NULL, GD_MsgHurl_low, PLACETEXT_LEFT, NULL, (APTR)MsgHurl_lowClicked,
+        184, 86, 65, 16, (UBYTE *)"to", NULL, GD_MsgHurl_high, PLACETEXT_LEFT, NULL, (APTR)MsgHurl_highClicked,
+        84, 126, 65, 16, (UBYTE *)"SysOp", NULL, GD_MsgSysOp_low, PLACETEXT_LEFT, NULL, (APTR)MsgSysOp_lowClicked,
+        184, 126, 65, 16, (UBYTE *)"to", NULL, GD_MsgSysOp_high, PLACETEXT_LEFT, NULL, (APTR)MsgSysOp_highClicked,
+        84, 106, 65, 16, (UBYTE *)"Re-Edit", NULL, GD_MsgReEdit_low, PLACETEXT_LEFT, NULL, (APTR)MsgReEdit_lowClicked,
+        184, 106, 65, 16, (UBYTE *)"to", NULL, GD_MsgReEdit_high, PLACETEXT_LEFT, NULL, (APTR)MsgReEdit_highClicked,
+        260, 6, 89, 16, (UBYTE *)"_Up", NULL, GD_MsgAreaUp_button, PLACETEXT_IN, NULL, (APTR)MsgAreaUp_buttonClicked,
+        260, 26, 89, 16, (UBYTE *)"_Down", NULL, GD_MsgAreaDown_button, PLACETEXT_IN, NULL, (APTR)MsgAreaDown_buttonClicked,
+        152, 151, 97, 31, (UBYTE *)"SAVE", NULL, GD_MsgAreaSave_button, PLACETEXT_IN, NULL, (APTR)MsgAreaSave_buttonClicked,
+        100, 306, 149, 16, (UBYTE *)"Char Set:", NULL, GD_MsgSaveCharSet_cycle, PLACETEXT_LEFT, NULL, (APTR)MsgSaveCharSet_cycleClicked,
+        468, 26, 89, 16, (UBYTE *)"Template", NULL, GD_MsgApplyTemplate_button, PLACETEXT_IN, NULL, (APTR)MsgApplyTemplate_buttonClicked,
+        324, 46, 233, 17, NULL, NULL, GD_MsgAreaName_string, 0, NULL, (APTR)MsgAreaName_stringClicked,
+        260, 46, 57, 17, NULL, NULL, GD_MsgAreaNumber_integer, 0, NULL, (APTR)MsgAreaNumber_integerClicked,
+        152, 236, 97, 17, (UBYTE *)"Translator:", NULL, GD_MsgTranslator_string, PLACETEXT_ABOVE, NULL, (APTR)MsgTranslator_stringClicked,
+        184, 261, 57, 17, (UBYTE *)"Message capacity:", NULL, GD_MsgCapacity_integer, PLACETEXT_LEFT, NULL, (APTR)MsgCapacity_integerClicked,
+        184, 281, 57, 17, (UBYTE *)"Renumber trigger:", NULL, GD_MsgRenumber_integer, PLACETEXT_LEFT, NULL, (APTR)MsgRenumber_integerClicked,
+        165, 326, 393, 17, (UBYTE *)"Origin/Newsgroup:", NULL, GD_MsgCustomOrigin_string, PLACETEXT_LEFT, NULL, (APTR)MsgCustomOrigin_stringClicked,
+        152, 186, 97, 21, (UBYTE *)"Import...", NULL, GD_MsgImportAreas_button, PLACETEXT_IN, NULL, (APTR)MsgImportAreas_buttonClicked
 };
 
 struct NewGadget User_EditorNGad[] = {
-	4, 2, 213, 160, NULL, NULL, GD_UserList_listview, 0, NULL, (APTR)UserList_listviewClicked,
-	200, 159, 177, 14, (UBYTE *)"Terminal", NULL, GD_UserTerminal_cycle, PLACETEXT_LEFT, NULL, (APTR)UserTerminal_cycleClicked,
-	199, 174, 106, 14, (UBYTE *)"Help Level", NULL, GD_UserHelp_cycle, PLACETEXT_LEFT, NULL, (APTR)UserHelp_cycleClicked,
-	231, 61, 26, 11, (UBYTE *)"More Prompt:", NULL, GD_UserMore_check, PLACETEXT_RIGHT, NULL, (APTR)UserMore_checkClicked,
-	64, 175, 57, 14, (UBYTE *)"Access", NULL, GD_UserAccessLevel_cycle, PLACETEXT_LEFT, NULL, (APTR)UserAccessLevel_cycleClicked,
-	231, 100, 26, 11, (UBYTE *)"Colour", NULL, GD_UserColour_check, PLACETEXT_RIGHT, NULL, (APTR)UserColour_checkClicked,
-	231, 112, 26, 11, (UBYTE *)"Positioning", NULL, GD_UserPositioning_check, PLACETEXT_RIGHT, NULL, (APTR)UserPositioning_checkClicked,
-	231, 124, 26, 11, (UBYTE *)"Screen Clears", NULL, GD_UserScreenClear_check, PLACETEXT_RIGHT, NULL, (APTR)UserScreenClear_checkClicked,
-	231, 135, 26, 11, (UBYTE *)"Partial Scrolling", NULL, GD_UserPartialScroll_check, PLACETEXT_RIGHT, NULL, (APTR)UserPartialScroll_checkClicked,
-	231, 37, 26, 11, (UBYTE *)"Hot Keys:", NULL, GD_UserHotKeys_check, PLACETEXT_RIGHT, NULL, (APTR)UserHotKeys_checkClicked,
-	231, 13, 26, 11, (UBYTE *)"Pop Screen:", NULL, GD_UserPopScreen_check, PLACETEXT_RIGHT, NULL, (APTR)UserPopScreen_checkClicked,
-	231, 49, 26, 11, (UBYTE *)"Lex Check:", NULL, GD_UserLexCheck_check, PLACETEXT_RIGHT, NULL, (APTR)UserLexCheck_checkClicked,
-	231, 73, 26, 11, (UBYTE *)"Bulletin Write:", NULL, GD_UserBulletinWrite_check, PLACETEXT_RIGHT, NULL, (APTR)UserBulletinWrite_checkClicked,
-	244, 282, 217, 14, (UBYTE *)"Upload", NULL, GD_UserUploadProtocol_cycle, PLACETEXT_LEFT, NULL, (APTR)UserUploadProtocol_cycleClicked,
-	244, 298, 217, 14, (UBYTE *)"Download", NULL, GD_UserDownloadProtocol_cycle, PLACETEXT_LEFT, NULL, (APTR)UserDownloadProtocol_cycleClicked,
-	231, 25, 26, 11, (UBYTE *)"Capture:", NULL, GD_UserCapture_check, PLACETEXT_RIGHT, NULL, (APTR)UserCapture_checkClicked,
-	64, 346, 397, 14, (UBYTE *)"Editor", NULL, GD_UserEditor_cycle, PLACETEXT_LEFT, NULL, (APTR)UserEditor_cycleClicked,
-	352, 330, 109, 14, (UBYTE *)"Char Set", NULL, GD_UserCharSet_cycle, PLACETEXT_LEFT, NULL, (APTR)UserCharSet_cycleClicked,
-	352, 314, 109, 14, (UBYTE *)"Archiver", NULL, GD_UserArchiver_cycle, PLACETEXT_LEFT, NULL, (APTR)UserArchiver_cycleClicked,
-	466, 203, 73, 13, (UBYTE *)"Fido Priv:", NULL, GD_UserNetmailPriv_cycle, PLACETEXT_LEFT, NULL, (APTR)UserNetmailPriv_cycleClicked,
-	64, 362, 397, 14, (UBYTE *)"Menu Set", NULL, GD_UserMenuSet_cycle, PLACETEXT_LEFT, NULL, (APTR)UserMenuSet_cycleClicked,
-	468, 307, 77, 15, (UBYTE *)"Global File", NULL, GD_UserGlobalFile_button, PLACETEXT_IN, NULL, (APTR)UserGlobalFile_buttonClicked,
-	468, 326, 77, 15, (UBYTE *)"Global Msg", NULL, GD_UserGlobalMsg_button, PLACETEXT_IN, NULL, (APTR)UserGlobalMsg_buttonClicked,
-	468, 289, 77, 15, (UBYTE *)"Global Arc", NULL, GD_UserGlobalArc_button, PLACETEXT_IN, NULL, (APTR)UserGlobalArc_buttonClicked,
-	466, 190, 73, 13, (UBYTE *)"UUCP Priv:", NULL, GD_UserUUCPPriv_cycle, PLACETEXT_LEFT, NULL, (APTR)UserUUCPPriv_cycleClicked,
-	472, 347, 69, 25, (UBYTE *)"SAVE", NULL, GD_UserSave_button, PLACETEXT_IN, NULL, (APTR)UserSave_buttonClicked,
-	296, 266, 81, 15, (UBYTE *)"Password", NULL, GD_UserPassword_string, PLACETEXT_LEFT, NULL, (APTR)UserPassword_stringClicked,
-	64, 298, 105, 15, (UBYTE *)"Joined", NULL, GD_UserJoined_string, PLACETEXT_LEFT, NULL, (APTR)UserJoined_stringClicked,
-	64, 313, 177, 15, (UBYTE *)"Last On", NULL, GD_UserLastLogin_string, PLACETEXT_LEFT, NULL, (APTR)UserLastLogin_stringClicked,
-	344, 190, 33, 15, (UBYTE *)"Long", NULL, GD_UserTermHeight_integer, PLACETEXT_LEFT, NULL, (APTR)UserTermHeight_integerClicked,
-	344, 174, 33, 15, (UBYTE *)"Wide", NULL, GD_UserTermWidth_integer, PLACETEXT_LEFT, NULL, (APTR)UserTermWidth_integerClicked,
-	7, 158, 26, 11, (UBYTE *)"Last Name Sort", NULL, GD_UserLastFirst_check, PLACETEXT_RIGHT|NG_HIGHLABEL, NULL, (APTR)UserLastFirst_checkClicked,
-	64, 190, 205, 15, (UBYTE *)"Name", NULL, GD_UserName_string, PLACETEXT_LEFT, NULL, (APTR)UserName_stringClicked,
-	64, 205, 205, 15, (UBYTE *)"Alias", NULL, GD_UserAlias_string, PLACETEXT_LEFT, NULL, (APTR)UserAlias_stringClicked,
-	64, 221, 173, 15, (UBYTE *)"Address", NULL, GD_UserAddress_string, PLACETEXT_LEFT, NULL, (APTR)UserAddress_stringClicked,
-	64, 236, 173, 15, (UBYTE *)"City", NULL, GD_UserCity_string, PLACETEXT_LEFT, NULL, (APTR)UserCity_stringClicked,
-	64, 251, 49, 15, (UBYTE *)"State", NULL, GD_UserState_string, PLACETEXT_LEFT, NULL, (APTR)UserState_stringClicked,
-	180, 251, 57, 15, (UBYTE *)"Post/Zip", NULL, GD_UserZip_string, PLACETEXT_LEFT, NULL, (APTR)UserZip_stringClicked,
-	64, 266, 165, 15, (UBYTE *)"Country", NULL, GD_UserCountry_string, PLACETEXT_LEFT, NULL, (APTR)UserCountry_stringClicked,
-	64, 282, 105, 15, (UBYTE *)"Phone", NULL, GD_UserPhone_string, PLACETEXT_LEFT, NULL, (APTR)UserPhone_stringClicked,
-	64, 329, 221, 15, (UBYTE *)"Stack", NULL, GD_UserLoginStack_string, PLACETEXT_LEFT, NULL, (APTR)UserLoginStack_stringClicked,
-	332, 221, 45, 15, (UBYTE *)"Daily Limit", NULL, GD_UserDailyLimit_integer, PLACETEXT_LEFT, NULL, (APTR)UserDailyLimit_integerClicked,
-	332, 236, 45, 15, (UBYTE *)"Call Limit", NULL, GD_UserSessionLimit_integer, PLACETEXT_LEFT, NULL, (APTR)UserSessionLimit_integerClicked,
-	332, 251, 45, 15, (UBYTE *)"Used Today", NULL, GD_UserTimeUsedToday_integer, PLACETEXT_LEFT, NULL, (APTR)UserTimeUsedToday_integerClicked,
-	494, 17, 45, 15, (UBYTE *)"Last File Area:", NULL, GD_UserLastFileArea_integer, PLACETEXT_LEFT, NULL, (APTR)UserLastFileArea_integerClicked,
-	466, 32, 73, 15, (UBYTE *)"Files U/L:", NULL, GD_UserFilesUp_integer, PLACETEXT_LEFT, NULL, (APTR)UserFilesUp_integerClicked,
-	466, 47, 73, 15, (UBYTE *)"D/L:", NULL, GD_UserFilesDown_integer, PLACETEXT_LEFT, NULL, (APTR)UserFilesDown_integerClicked,
-	466, 62, 73, 15, (UBYTE *)"Bytes U/L:", NULL, GD_UserKUp_integer, PLACETEXT_LEFT, NULL, (APTR)UserKUp_integerClicked,
-	466, 77, 73, 15, (UBYTE *)"D/L:", NULL, GD_UserKDown_integer, PLACETEXT_LEFT, NULL, (APTR)UserKDown_integerClicked,
-	466, 92, 73, 15, (UBYTE *)"PVT Limit:", NULL, GD_UserPVTLimit_integer, PLACETEXT_LEFT, NULL, (APTR)UserPVTLimit_integerClicked,
-	466, 107, 73, 15, (UBYTE *)"Ratio:", NULL, GD_UserFileRatio_integer, PLACETEXT_LEFT, NULL, (APTR)UserFileRatio_integerClicked,
-	494, 144, 45, 15, (UBYTE *)"Last Msg Area:", NULL, GD_UserLastMsgArea_integer, PLACETEXT_LEFT, NULL, (APTR)UserLastMsgArea_integerClicked,
-	466, 159, 73, 15, (UBYTE *)"Msgs Read:", NULL, GD_UserMsgsRead_integer, PLACETEXT_LEFT, NULL, (APTR)UserMsgsRead_integerClicked,
-	466, 174, 73, 15, (UBYTE *)"Written:", NULL, GD_UserMsgsWritten_integer, PLACETEXT_LEFT, NULL, (APTR)UserMsgsWritten_integerClicked,
-	466, 216, 73, 15, (UBYTE *)"Net Credit:", NULL, GD_UserNetCredit_integer, PLACETEXT_LEFT, NULL, (APTR)UserNetCredit_integerClicked,
-	468, 238, 77, 15, (UBYTE *)"Total Time", NULL, GD_UserTotalTime_integer, PLACETEXT_LEFT, NULL, (APTR)UserTotalTime_integerClicked,
-	468, 253, 77, 15, (UBYTE *)"Total Calls", NULL, GD_UserTotalCalls_integer, PLACETEXT_LEFT, NULL, (APTR)UserTotalCalls_integerClicked,
-	468, 268, 77, 15, (UBYTE *)"SysOp Pages", NULL, GD_UserSysOpPages_integer, PLACETEXT_LEFT, NULL, (APTR)UserSysOpPages_integerClicked
+        4, 6, 265, 180, NULL, NULL, GD_UserList_listview, 0, NULL, (APTR)UserList_listviewClicked,
+        228, 211, 257, 16, (UBYTE *)"Type", NULL, GD_UserTerminal_cycle, PLACETEXT_LEFT, NULL, (APTR)UserTerminal_cycleClicked,
+        492, 351, 137, 16, (UBYTE *)"Help Level", NULL, GD_UserHelp_cycle, PLACETEXT_ABOVE, NULL, (APTR)UserHelp_cycleClicked,
+        284, 76, 26, 11, (UBYTE *)"More Prompt", NULL, GD_UserMore_check, PLACETEXT_RIGHT, NULL, (APTR)UserMore_checkClicked,
+        76, 211, 76, 16, (UBYTE *)"Level", NULL, GD_UserAccessLevel_cycle, PLACETEXT_LEFT, NULL, (APTR)UserAccessLevel_cycleClicked,
+        284, 121, 26, 11, (UBYTE *)"Colour", NULL, GD_UserColour_check, PLACETEXT_RIGHT, NULL, (APTR)UserColour_checkClicked,
+        284, 136, 26, 11, (UBYTE *)"Positioning", NULL, GD_UserPositioning_check, PLACETEXT_RIGHT, NULL, (APTR)UserPositioning_checkClicked,
+        284, 151, 26, 11, (UBYTE *)"Screen TOF", NULL, GD_UserScreenClear_check, PLACETEXT_RIGHT, NULL, (APTR)UserScreenClear_checkClicked,
+        284, 166, 26, 11, (UBYTE *)"Scrolling", NULL, GD_UserPartialScroll_check, PLACETEXT_RIGHT, NULL, (APTR)UserPartialScroll_checkClicked,
+        284, 46, 26, 11, (UBYTE *)"Hot Keys", NULL, GD_UserHotKeys_check, PLACETEXT_RIGHT, NULL, (APTR)UserHotKeys_checkClicked,
+        284, 16, 26, 11, (UBYTE *)"Pop Screen", NULL, GD_UserPopScreen_check, PLACETEXT_RIGHT, NULL, (APTR)UserPopScreen_checkClicked,
+        284, 61, 26, 11, (UBYTE *)"Lex Check", NULL, GD_UserLexCheck_check, PLACETEXT_RIGHT, NULL, (APTR)UserLexCheck_checkClicked,
+        284, 91, 26, 11, (UBYTE *)"Bulletin Wr.", NULL, GD_UserBulletinWrite_check, PLACETEXT_RIGHT, NULL, (APTR)UserBulletinWrite_checkClicked,
+        76, 431, 201, 16, (UBYTE *)"Upload", NULL, GD_UserUploadProtocol_cycle, PLACETEXT_LEFT, NULL, (APTR)UserUploadProtocol_cycleClicked,
+        76, 411, 201, 16, (UBYTE *)"Download", NULL, GD_UserDownloadProtocol_cycle, PLACETEXT_LEFT, NULL, (APTR)UserDownloadProtocol_cycleClicked,
+        284, 31, 26, 11, (UBYTE *)"Capture", NULL, GD_UserCapture_check, PLACETEXT_RIGHT, NULL, (APTR)UserCapture_checkClicked,
+        76, 371, 553, 16, (UBYTE *)"Editor", NULL, GD_UserEditor_cycle, PLACETEXT_LEFT, NULL, (APTR)UserEditor_cycleClicked,
+        364, 431, 145, 16, (UBYTE *)"Charset", NULL, GD_UserCharSet_cycle, PLACETEXT_LEFT, NULL, (APTR)UserCharSet_cycleClicked,
+        364, 411, 145, 16, (UBYTE *)"Archiver", NULL, GD_UserArchiver_cycle, PLACETEXT_LEFT, NULL, (APTR)UserArchiver_cycleClicked,
+        540, 166, 81, 16, (UBYTE *)"Fido Priv", NULL, GD_UserNetmailPriv_cycle, PLACETEXT_ABOVE, NULL, (APTR)UserNetmailPriv_cycleClicked,
+        76, 391, 553, 16, (UBYTE *)"Menuset", NULL, GD_UserMenuSet_cycle, PLACETEXT_LEFT, NULL, (APTR)UserMenuSet_cycleClicked,
+        492, 191, 137, 16, (UBYTE *)"Global File...", NULL, GD_UserGlobalFile_button, PLACETEXT_IN, NULL, (APTR)UserGlobalFile_buttonClicked,
+        492, 211, 137, 16, (UBYTE *)"Global Msg...", NULL, GD_UserGlobalMsg_button, PLACETEXT_IN, NULL, (APTR)UserGlobalMsg_buttonClicked,
+        492, 231, 137, 16, (UBYTE *)"Global Arc...", NULL, GD_UserGlobalArc_button, PLACETEXT_IN, NULL, (APTR)UserGlobalArc_buttonClicked,
+        444, 166, 81, 16, (UBYTE *)"UUCP Priv", NULL, GD_UserUUCPPriv_cycle, PLACETEXT_ABOVE, NULL, (APTR)UserUUCPPriv_cycleClicked,
+        532, 411, 97, 36, (UBYTE *)"SAVE", NULL, GD_UserSave_button, PLACETEXT_IN, NULL, (APTR)UserSave_buttonClicked,
+        380, 231, 105, 17, (UBYTE *)"Password", NULL, GD_UserPassword_string, PLACETEXT_LEFT, NULL, (APTR)UserPassword_stringClicked,
+        364, 311, 121, 17, (UBYTE *)"Joined", NULL, GD_UserJoined_string, PLACETEXT_LEFT, NULL, (APTR)UserJoined_stringClicked,
+        372, 331, 113, 17, (UBYTE *)"Last On", NULL, GD_UserLastLogin_string, PLACETEXT_LEFT, NULL, (APTR)UserLastLogin_stringClicked,
+        436, 191, 49, 17, (UBYTE *)"Height", NULL, GD_UserTermHeight_integer, PLACETEXT_LEFT, NULL, (APTR)UserTermHeight_integerClicked,
+        308, 191, 49, 17, (UBYTE *)"Terminal Width", NULL, GD_UserTermWidth_integer, PLACETEXT_LEFT, NULL, (APTR)UserTermWidth_integerClicked,
+        12, 191, 26, 11, (UBYTE *)"Last Name Sort", NULL, GD_UserLastFirst_check, PLACETEXT_RIGHT|NG_HIGHLABEL, NULL, (APTR)UserLastFirst_checkClicked,
+        76, 231, 225, 17, (UBYTE *)"Name", NULL, GD_UserName_string, PLACETEXT_LEFT, NULL, (APTR)UserName_stringClicked,
+        76, 251, 225, 17, (UBYTE *)"Alias", NULL, GD_UserAlias_string, PLACETEXT_LEFT, NULL, (APTR)UserAlias_stringClicked,
+        76, 271, 225, 17, (UBYTE *)"Address", NULL, GD_UserAddress_string, PLACETEXT_LEFT, NULL, (APTR)UserAddress_stringClicked,
+        76, 291, 225, 17, (UBYTE *)"City", NULL, GD_UserCity_string, PLACETEXT_LEFT, NULL, (APTR)UserCity_stringClicked,
+        76, 311, 97, 17, (UBYTE *)"State", NULL, GD_UserState_string, PLACETEXT_LEFT, NULL, (APTR)UserState_stringClicked,
+        228, 311, 73, 17, (UBYTE *)"Zip", NULL, GD_UserZip_string, PLACETEXT_LEFT, NULL, (APTR)UserZip_stringClicked,
+        76, 331, 225, 17, (UBYTE *)"Country", NULL, GD_UserCountry_string, PLACETEXT_LEFT, NULL, (APTR)UserCountry_stringClicked,
+        76, 351, 137, 17, (UBYTE *)"Phone", NULL, GD_UserPhone_string, PLACETEXT_LEFT, NULL, (APTR)UserPhone_stringClicked,
+        276, 351, 209, 17, (UBYTE *)"Stack", NULL, GD_UserLoginStack_string, PLACETEXT_LEFT, NULL, (APTR)UserLoginStack_stringClicked,
+        428, 251, 57, 17, (UBYTE *)"Daily Limit", NULL, GD_UserDailyLimit_integer, PLACETEXT_LEFT, NULL, (APTR)UserDailyLimit_integerClicked,
+        428, 271, 57, 17, (UBYTE *)"Call Limit", NULL, GD_UserSessionLimit_integer, PLACETEXT_LEFT, NULL, (APTR)UserSessionLimit_integerClicked,
+        544, 251, 57, 17, (UBYTE *)"Used", NULL, GD_UserTimeUsedToday_integer, PLACETEXT_LEFT, NULL, (APTR)UserTimeUsedToday_integerClicked,
+        564, 15, 57, 17, (UBYTE *)"Last Area:", NULL, GD_UserLastFileArea_integer, PLACETEXT_LEFT, NULL, (APTR)UserLastFileArea_integerClicked,
+        468, 56, 81, 17, NULL, NULL, GD_UserFileInput_integer, 0, NULL, (APTR)UserFileInput_integerClicked,
+        564, 91, 57, 17, (UBYTE *)"Last Area:", NULL, GD_UserLastMsgArea_integer, PLACETEXT_LEFT, NULL, (APTR)UserLastMsgArea_integerClicked,
+        468, 131, 81, 17, NULL, NULL, GD_UserMsgInput_integer, 0, NULL, (APTR)UserMsgInput_integerClicked,
+        548, 311, 73, 17, (UBYTE *)"Time", NULL, GD_UserTotalTime_integer, PLACETEXT_LEFT, NULL, (APTR)UserTotalTime_integerClicked,
+        548, 291, 73, 17, (UBYTE *)"Calls", NULL, GD_UserTotalCalls_integer, PLACETEXT_LEFT, NULL, (APTR)UserTotalCalls_integerClicked,
+        428, 291, 57, 17, (UBYTE *)"SysOp Pages", NULL, GD_UserSysOpPages_integer, PLACETEXT_LEFT, NULL, (APTR)UserSysOpPages_integerClicked,
+        444, 36, 177, 16, NULL, NULL, GD_UserFileChooser_cycle, 0, NULL, (APTR)UserFileChooser_cycleClicked,
+        444, 111, 177, 16, NULL, NULL, GD_UserMsgChooser_cycle, 0, NULL, (APTR)UserMsgChooser_cycleClicked
 };
 
 struct NewGadget Main_Status_DisplayNGad[] = {
-	4, 55, 149, 15, (UBYTE *)"_File Area Manager", NULL, GD_FileAreaSelect_button, PLACETEXT_IN, NULL, (APTR)FileAreaSelect_buttonClicked,
-	4, 73, 149, 15, (UBYTE *)"_Message Area Manager", NULL, GD_MessageAreaSelect_button, PLACETEXT_IN, NULL, (APTR)MessageAreaSelect_buttonClicked,
-	4, 91, 149, 15, (UBYTE *)"_User Editor", NULL, GD_UserEditorSelect_button, PLACETEXT_IN, NULL, (APTR)UserEditorSelect_buttonClicked
+        4, 51, 193, 16, (UBYTE *)"_File Area Manager", NULL, GD_FileAreaSelect_button, PLACETEXT_IN, NULL, (APTR)FileAreaSelect_buttonClicked,
+        4, 71, 193, 16, (UBYTE *)"_Message Area Manager", NULL, GD_MessageAreaSelect_button, PLACETEXT_IN, NULL, (APTR)MessageAreaSelect_buttonClicked,
+        4, 91, 193, 16, (UBYTE *)"_User Editor", NULL, GD_UserEditorSelect_button, PLACETEXT_IN, NULL, (APTR)UserEditorSelect_buttonClicked
 };
 
 struct NewGadget FileAreaTemplateNGad[] = {
-	10, 16, 293, 200, NULL, NULL, GD_FileTemplateSrc_listview, 0, NULL, (APTR)FileTemplateSrc_listviewClicked,
-	306, 16, 293, 200, NULL, NULL, GD_FileTemplateDest_listview, 0, NULL, (APTR)FileTemplateDest_listviewClicked,
-	406, 217, 93, 23, (UBYTE *)"APPLY", NULL, GD_FileTemplateApply_button, PLACETEXT_IN, NULL, (APTR)FileTemplateApply_buttonClicked,
-	506, 217, 93, 23, (UBYTE *)"Cancel", NULL, GD_FileTemplateCancel_button, PLACETEXT_IN, NULL, (APTR)FileTemplateCancel_buttonClicked,
-	11, 222, 26, 11, (UBYTE *)"Confirm each application of template area", NULL, GD_FileTemplateConfirmApply_check, PLACETEXT_RIGHT, NULL, (APTR)FileTemplateConfirmApply_checkClicked
+        12, 21, 297, 200, (UBYTE *)"Available Areas", NULL, GD_FileTemplateSrc_listview, PLACETEXT_ABOVE, NULL, (APTR)FileTemplateSrc_listviewClicked,
+        316, 21, 297, 200, (UBYTE *)"Target Areas", NULL, GD_FileTemplateTarg_listview, PLACETEXT_ABOVE, NULL, (APTR)FileTemplateTarg_listviewClicked,
+        12, 231, 113, 26, (UBYTE *)"APPLY", NULL, GD_FileTemplateApply_button, PLACETEXT_IN, NULL, (APTR)FileTemplateApply_buttonClicked,
+        500, 231, 113, 26, (UBYTE *)"Cancel", NULL, GD_FileTemplateCancel_button, PLACETEXT_IN, NULL, (APTR)FileTemplateCancel_buttonClicked,
+        12, 261, 26, 11, (UBYTE *)"Confirm", NULL, GD_FileTemplateConfirm_check, PLACETEXT_RIGHT, NULL, (APTR)FileTemplateConfirm_checkClicked,
+        148, 231, 26, 11, (UBYTE *)"Access", NULL, GD_FileTempAccess_check, PLACETEXT_RIGHT, NULL, (APTR)FileTempAccess_checkClicked,
+        148, 246, 26, 11, (UBYTE *)"Upload", NULL, GD_FileTempUpload_check, PLACETEXT_RIGHT, NULL, (APTR)FileTempUpload_checkClicked,
+        148, 261, 26, 11, (UBYTE *)"Download", NULL, GD_FileTempDownload_check, PLACETEXT_RIGHT, NULL, (APTR)FileTempDownload_checkClicked,
+        148, 276, 26, 11, (UBYTE *)"Transfer", NULL, GD_FileTempTransfer_check, PLACETEXT_RIGHT, NULL, (APTR)FileTempTransfer_checkClicked,
+        272, 231, 26, 11, (UBYTE *)"Kill", NULL, GD_FileTempKill_check, PLACETEXT_RIGHT, NULL, (APTR)FileTempKill_checkClicked,
+        272, 246, 26, 11, (UBYTE *)"SysOp", NULL, GD_FileTempSysop_check, PLACETEXT_RIGHT, NULL, (APTR)FileTempSysop_checkClicked,
+        396, 231, 26, 11, (UBYTE *)"Path", NULL, GD_FileTempPath_check, PLACETEXT_RIGHT, NULL, (APTR)FileTempPath_checkClicked,
+        396, 246, 26, 11, (UBYTE *)"Users", NULL, GD_FileTempUsers_check, PLACETEXT_RIGHT, NULL, (APTR)FileTempUsers_checkClicked,
+        272, 276, 26, 11, (UBYTE *)"F'reqable", NULL, GD_FileTempFreq_check, PLACETEXT_RIGHT, NULL, (APTR)FileTempFreq_checkClicked,
+        272, 261, 26, 11, (UBYTE *)"Validation", NULL, GD_FileTempValidation_check, PLACETEXT_RIGHT, NULL, (APTR)FileTempValidation_checkClicked,
+        396, 261, 26, 11, (UBYTE *)"Validation Area", NULL, GD_FileTempValArea_check, PLACETEXT_RIGHT, NULL, (APTR)FileTempValArea_checkClicked
 };
 
 struct NewGadget MsgAreaTemplateNGad[] = {
-	10, 16, 293, 200, NULL, NULL, GD_MsgTemplateSrc_listview, 0, NULL, (APTR)MsgTemplateSrc_listviewClicked,
-	306, 16, 293, 200, NULL, NULL, GD_MsgTemplateDest_listview, 0, NULL, (APTR)MsgTemplateDest_listviewClicked,
-	406, 217, 93, 23, (UBYTE *)"APPLY", NULL, GD_MsgTemplateApply_button, PLACETEXT_IN, NULL, (APTR)MsgTemplateApply_buttonClicked,
-	506, 217, 93, 23, (UBYTE *)"Cancel", NULL, GD_MsgTemplateCancel_button, PLACETEXT_IN, NULL, (APTR)MsgTemplateCancel_buttonClicked,
-	11, 222, 26, 11, (UBYTE *)"Confirm each application of template area", NULL, GD_MsgTemplateConfirmApply_check, PLACETEXT_RIGHT, NULL, (APTR)MsgTemplateConfirmApply_checkClicked
+        12, 21, 297, 200, (UBYTE *)"Available Areas", NULL, GD_MsgTemplateSrc_listview, PLACETEXT_ABOVE, NULL, (APTR)MsgTemplateSrc_listviewClicked,
+        316, 21, 297, 200, (UBYTE *)"Target Areas", NULL, GD_MsgTemplateTarg_listview, PLACETEXT_ABOVE, NULL, (APTR)MsgTemplateTarg_listviewClicked,
+        12, 231, 113, 28, (UBYTE *)"APPLY", NULL, GD_MsgTemplateApply_button, PLACETEXT_IN, NULL, (APTR)MsgTemplateApply_buttonClicked,
+        500, 231, 113, 28, (UBYTE *)"Cancel", NULL, GD_MsgTemplateCancel_button, PLACETEXT_IN, NULL, (APTR)MsgTemplateCancel_buttonClicked,
+        12, 266, 26, 11, (UBYTE *)"Confirm", NULL, GD_MsgTemplateConfirm_check, PLACETEXT_RIGHT, NULL, (APTR)MsgTemplateConfirm_checkClicked,
+        148, 231, 26, 11, (UBYTE *)"Access", NULL, GD_MsgTempAccess_check, PLACETEXT_RIGHT, NULL, (APTR)MsgTempAccess_checkClicked,
+        148, 246, 26, 11, (UBYTE *)"Write", NULL, GD_MsgTempWrite_check, PLACETEXT_RIGHT, NULL, (APTR)MsgTempWrite_checkClicked,
+        148, 261, 26, 11, (UBYTE *)"Forward", NULL, GD_MsgTempForward_check, PLACETEXT_RIGHT, NULL, (APTR)MsgTempForward_checkClicked,
+        148, 291, 26, 11, (UBYTE *)"Copy", NULL, GD_MsgTempCopy_check, PLACETEXT_RIGHT, NULL, (APTR)MsgTempCopy_checkClicked,
+        273, 231, 26, 11, (UBYTE *)"Kill", NULL, GD_MsgTempKill_check, PLACETEXT_RIGHT, NULL, (APTR)MsgTempKill_checkClicked,
+        148, 276, 26, 11, (UBYTE *)"Re-Edit", NULL, GD_MsgTempReEdit_check, PLACETEXT_RIGHT, NULL, (APTR)MsgTempReEdit_checkClicked,
+        273, 246, 26, 11, (UBYTE *)"SysOp", NULL, GD_MsgTempSysop_check, PLACETEXT_RIGHT, NULL, (APTR)MsgTempSysop_checkClicked,
+        273, 276, 26, 11, (UBYTE *)"Users", NULL, GD_MsgTempUsers_check, PLACETEXT_RIGHT, NULL, (APTR)MsgTempUsers_checkClicked,
+        273, 261, 26, 11, (UBYTE *)"Translator", NULL, GD_MsgTempTranslator_check, PLACETEXT_RIGHT, NULL, (APTR)MsgTempTranslator_checkClicked,
+        392, 261, 26, 11, (UBYTE *)"Capacity/Renumber", NULL, GD_MsgTempCapacity_check, PLACETEXT_RIGHT, NULL, (APTR)MsgTempCapacity_checkClicked,
+        392, 231, 26, 11, (UBYTE *)"CharSet", NULL, GD_MsgTempCharset_check, PLACETEXT_RIGHT, NULL, (APTR)MsgTempCharset_checkClicked,
+        273, 291, 26, 11, (UBYTE *)"Mail type", NULL, GD_MsgTempMailtype_check, PLACETEXT_RIGHT, NULL, (APTR)MsgTempMailtype_checkClicked,
+        392, 246, 26, 11, (UBYTE *)"Handles", NULL, GD_MsgTempHandles_check, PLACETEXT_RIGHT, NULL, (APTR)MsgTempHandles_checkClicked
+};
+
+struct NewGadget FileUserAccessNGad[] = {
+        12, 21, 265, 150, (UBYTE *)"Available Users", NULL, GD_FileAccessUserSrc_listview, PLACETEXT_ABOVE, NULL, (APTR)FileAccessUserSrc_listviewClicked,
+        12, 196, 265, 150, (UBYTE *)"Users To Modify", NULL, GD_FileAccessUserTarg_listview, PLACETEXT_ABOVE, NULL, (APTR)FileAccessUserTarg_listviewClicked,
+        284, 21, 297, 150, (UBYTE *)"Available File Areas", NULL, GD_FileAccessAreaSrc_listview, PLACETEXT_ABOVE, NULL, (APTR)FileAccessAreaSrc_listviewClicked,
+        284, 196, 297, 150, (UBYTE *)"File Areas To Add", NULL, GD_FileAccessAreaTarg_listview, PLACETEXT_ABOVE, NULL, (APTR)FileAccessAreaTarg_listviewClicked,
+        12, 356, 109, 36, (UBYTE *)"Begin", NULL, GD_FileAccessBegin_button, PLACETEXT_IN, NULL, (APTR)FileAccessBegin_buttonClicked,
+        474, 356, 109, 36, (UBYTE *)"Cancel", NULL, GD_FileAccessCancel_button, PLACETEXT_IN, NULL, (APTR)FileAccessCancel_buttonClicked,
+        360, 357, 93, 16, (UBYTE *)"Users Selected", NULL, GD_FileAccessUsers_text, PLACETEXT_LEFT, NULL, NULL,
+        360, 376, 93, 16, (UBYTE *)"Areas selected", NULL, GD_FileAccessAreas_text, PLACETEXT_LEFT, NULL, NULL,
+        200, 361, 17, 9, NULL, NULL, GD_FileUserAccessMX, PLACETEXT_LEFT, NULL, (APTR)FileUserAccessMXClicked
 };
 
 ULONG File_Area_ManagerGTags[] = {
-	(GTLV_ShowSelected), NULL, (TAG_DONE),
-	(GA_Disabled), TRUE, (TAG_DONE),
-	(GA_Disabled), TRUE, (TAG_DONE),
-	(GA_Disabled), TRUE, (TAG_DONE),
-	(GA_Disabled), TRUE, (TAG_DONE),
-	(GA_Disabled), TRUE, (TAG_DONE),
-	(GA_Disabled), TRUE, (TAG_DONE),
-	(GTCY_Labels), (ULONG)&FileEnter_low0Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
-	(GTCY_Labels), (ULONG)&FileEnter_high0Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
-	(GTCY_Labels), (ULONG)&FileKill_low0Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
-	(GTCY_Labels), (ULONG)&FileKill_high0Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
-	(GTCY_Labels), (ULONG)&FileHurl_low0Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
-	(GTCY_Labels), (ULONG)&FileHurl_high0Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
-	(GTCY_Labels), (ULONG)&FileUpload_low0Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
-	(GTCY_Labels), (ULONG)&FileUpload_high0Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
-	(GTCY_Labels), (ULONG)&FileSysOp_low0Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
-	(GTCY_Labels), (ULONG)&FileSysOp_high0Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
-	(GTCY_Labels), (ULONG)&FileDownload_low0Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
-	(GTCY_Labels), (ULONG)&FileDownload_high0Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
-	(GT_Underscore), '_', (GA_Disabled), TRUE, (TAG_DONE),
-	(GT_Underscore), '_', (GA_Disabled), TRUE, (TAG_DONE),
-	(GA_Disabled), TRUE, (TAG_DONE),
-	(GA_Disabled), TRUE, (TAG_DONE),
-	(GTST_MaxChars), 33, (GA_Disabled), TRUE, (TAG_DONE),
-	(GTIN_Number), 0, (GTIN_MaxChars), 4, (STRINGA_Justification), (GACT_STRINGCENTER), (GA_Disabled), TRUE, (TAG_DONE),
-	(GTST_MaxChars), 7, (GA_Disabled), TRUE, (TAG_DONE),
-	(GTIN_Number), 0, (GTIN_MaxChars), 4, (STRINGA_Justification), (GACT_STRINGCENTER), (GA_Disabled), TRUE, (TAG_DONE),
-	(GA_Disabled), TRUE, (TAG_DONE)
+        (GTLV_ShowSelected), NULL, (TAG_DONE),
+        (TAG_DONE),
+        (GA_Disabled), TRUE, (TAG_DONE),
+        (GA_Disabled), TRUE, (TAG_DONE),
+        (GA_Disabled), TRUE, (TAG_DONE),
+        (GA_Disabled), TRUE, (TAG_DONE),
+        (GA_Disabled), TRUE, (TAG_DONE),
+        (GTCY_Labels), (ULONG)&FileEnter_low0Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
+        (GTCY_Labels), (ULONG)&FileEnter_high0Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
+        (GTCY_Labels), (ULONG)&FileKill_low0Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
+        (GTCY_Labels), (ULONG)&FileKill_high0Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
+        (GTCY_Labels), (ULONG)&FileHurl_low0Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
+        (GTCY_Labels), (ULONG)&FileHurl_high0Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
+        (GTCY_Labels), (ULONG)&FileUpload_low0Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
+        (GTCY_Labels), (ULONG)&FileUpload_high0Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
+        (GTCY_Labels), (ULONG)&FileSysOp_low0Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
+        (GTCY_Labels), (ULONG)&FileSysOp_high0Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
+        (GTCY_Labels), (ULONG)&FileDownload_low0Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
+        (GTCY_Labels), (ULONG)&FileDownload_high0Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
+        (GT_Underscore), '_', (GA_Disabled), TRUE, (TAG_DONE),
+        (GT_Underscore), '_', (GA_Disabled), TRUE, (TAG_DONE),
+        (GA_Disabled), TRUE, (TAG_DONE),
+        (GA_Disabled), TRUE, (TAG_DONE),
+        (GTST_MaxChars), 33, (GA_Disabled), TRUE, (TAG_DONE),
+        (GTIN_Number), 0, (GTIN_MaxChars), 4, (STRINGA_Justification), (GACT_STRINGCENTER), (GA_Disabled), TRUE, (TAG_DONE),
+        (GTST_MaxChars), 7, (GA_Disabled), TRUE, (TAG_DONE),
+        (GTIN_Number), 0, (GTIN_MaxChars), 4, (STRINGA_Justification), (GACT_STRINGCENTER), (GA_Disabled), TRUE, (TAG_DONE),
+        (GA_Disabled), TRUE, (TAG_DONE)
 };
 
 ULONG Message_Area_ManagerGTags[] = {
-	(GTLV_ShowSelected), NULL, (TAG_DONE),
-	(GA_Disabled), TRUE, (TAG_DONE),
-	(GA_Disabled), TRUE, (TAG_DONE),
-	(GA_Disabled), TRUE, (TAG_DONE),
-	(GA_Disabled), TRUE, (TAG_DONE),
-	(GA_Disabled), TRUE, (TAG_DONE),
-	(GA_Disabled), TRUE, (TAG_DONE),
-	(GA_Disabled), TRUE, (TAG_DONE),
-	(GA_Disabled), TRUE, (TAG_DONE),
-	(GA_Disabled), TRUE, (TAG_DONE),
-	(GTSL_Min), 10, (GTSL_Max), 9000, (GTSL_MaxLevelLen), 5, (GTSL_LevelFormat), (ULONG)"%-4ld", (GTSL_LevelPlace), (PLACETEXT_RIGHT), (PGA_Freedom), LORIENT_HORIZ, (GA_Immediate), TRUE, (GA_RelVerify), TRUE, (GA_Disabled), TRUE, (TAG_DONE),
-	(GTSL_Min), 10, (GTSL_Max), 9000, (GTSL_MaxLevelLen), 5, (GTSL_LevelFormat), (ULONG)"%-4ld", (GTSL_LevelPlace), (PLACETEXT_RIGHT), (PGA_Freedom), LORIENT_HORIZ, (GA_Immediate), TRUE, (GA_RelVerify), TRUE, (GA_Disabled), TRUE, (TAG_DONE),
-	(GTCY_Labels), (ULONG)&MsgEnter_low1Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
-	(GTCY_Labels), (ULONG)&MsgEnter_high1Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
-	(GTCY_Labels), (ULONG)&MsgWrite_low1Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
-	(GTCY_Labels), (ULONG)&MsgWrite_high1Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
-	(GTCY_Labels), (ULONG)&MsgKill_low1Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
-	(GTCY_Labels), (ULONG)&MsgKill_high1Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
-	(GTCY_Labels), (ULONG)&MsgForward_low1Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
-	(GTCY_Labels), (ULONG)&MsgForward_high1Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
-	(GTCY_Labels), (ULONG)&MsgHurl_low1Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
-	(GTCY_Labels), (ULONG)&MsgHurl_high1Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
-	(GTCY_Labels), (ULONG)&MsgSysOp_low1Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
-	(GTCY_Labels), (ULONG)&MsgSysOp_high1Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
-	(GTCY_Labels), (ULONG)&MsgReEdit_low1Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
-	(GTCY_Labels), (ULONG)&MsgReEdit_high1Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
-	(GT_Underscore), '_', (GA_Disabled), TRUE, (TAG_DONE),
-	(GT_Underscore), '_', (GA_Disabled), TRUE, (TAG_DONE),
-	(GA_Disabled), TRUE, (TAG_DONE),
-	(GTCY_Labels), (ULONG)&MsgSaveCharSet_cycle1Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
-	(GA_Disabled), TRUE, (TAG_DONE),
-	(GTST_MaxChars), 33, (GA_Disabled), TRUE, (TAG_DONE),
-	(GTIN_Number), 0, (GTIN_MaxChars), 4, (STRINGA_Justification), (GACT_STRINGCENTER), (GA_Disabled), TRUE, (TAG_DONE),
-	(GTST_MaxChars), 11, (GA_Disabled), TRUE, (TAG_DONE),
-	(GTIN_Number), 10, (GTIN_MaxChars), 4, (TAG_DONE),
-	(GTIN_Number), 10, (GTIN_MaxChars), 4, (TAG_DONE),
-	(GTST_MaxChars), 74, (GA_Disabled), TRUE, (TAG_DONE),
-	(GA_Disabled), TRUE, (TAG_DONE)
+        (GTLV_ShowSelected), NULL, (TAG_DONE),
+        (TAG_DONE),
+        (GA_Disabled), TRUE, (TAG_DONE),
+        (GA_Disabled), TRUE, (TAG_DONE),
+        (GA_Disabled), TRUE, (TAG_DONE),
+        (GA_Disabled), TRUE, (TAG_DONE),
+        (GA_Disabled), TRUE, (TAG_DONE),
+        (GA_Disabled), TRUE, (TAG_DONE),
+        (GA_Disabled), TRUE, (TAG_DONE),
+        (GA_Disabled), TRUE, (TAG_DONE),
+        (GTCY_Labels), (ULONG)&MsgEnter_low1Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
+        (GTCY_Labels), (ULONG)&MsgEnter_high1Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
+        (GTCY_Labels), (ULONG)&MsgWrite_low1Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
+        (GTCY_Labels), (ULONG)&MsgWrite_high1Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
+        (GTCY_Labels), (ULONG)&MsgKill_low1Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
+        (GTCY_Labels), (ULONG)&MsgKill_high1Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
+        (GTCY_Labels), (ULONG)&MsgForward_low1Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
+        (GTCY_Labels), (ULONG)&MsgForward_high1Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
+        (GTCY_Labels), (ULONG)&MsgHurl_low1Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
+        (GTCY_Labels), (ULONG)&MsgHurl_high1Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
+        (GTCY_Labels), (ULONG)&MsgSysOp_low1Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
+        (GTCY_Labels), (ULONG)&MsgSysOp_high1Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
+        (GTCY_Labels), (ULONG)&MsgReEdit_low1Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
+        (GTCY_Labels), (ULONG)&MsgReEdit_high1Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
+        (GT_Underscore), '_', (GA_Disabled), TRUE, (TAG_DONE),
+        (GT_Underscore), '_', (GA_Disabled), TRUE, (TAG_DONE),
+        (GA_Disabled), TRUE, (TAG_DONE),
+        (GTCY_Labels), (ULONG)&MsgSaveCharSet_cycle1Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
+        (GA_Disabled), TRUE, (TAG_DONE),
+        (GTST_MaxChars), 33, (GA_Disabled), TRUE, (TAG_DONE),
+        (GTIN_Number), 0, (GTIN_MaxChars), 4, (STRINGA_Justification), (GACT_STRINGCENTER), (GA_Disabled), TRUE, (TAG_DONE),
+        (GTST_MaxChars), 11, (GA_Disabled), TRUE, (TAG_DONE),
+        (GTIN_Number), 10, (GTIN_MaxChars), 4, (TAG_DONE),
+        (GTIN_Number), 10, (GTIN_MaxChars), 4, (TAG_DONE),
+        (GTST_MaxChars), 74, (GA_Disabled), TRUE, (TAG_DONE),
+        (GA_Disabled), TRUE, (TAG_DONE)
 };
 
 ULONG User_EditorGTags[] = {
-	(GTLV_ShowSelected), NULL, (TAG_DONE),
-	(GTCY_Labels), (ULONG)&UserTerminal_cycle2Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
-	(GTCY_Labels), (ULONG)&UserHelp_cycle2Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
-	(GA_Disabled), TRUE, (TAG_DONE),
-	(GTCY_Labels), (ULONG)&UserAccessLevel_cycle2Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
-	(GA_Disabled), TRUE, (TAG_DONE),
-	(GA_Disabled), TRUE, (TAG_DONE),
-	(GA_Disabled), TRUE, (TAG_DONE),
-	(GA_Disabled), TRUE, (TAG_DONE),
-	(GA_Disabled), TRUE, (TAG_DONE),
-	(GA_Disabled), TRUE, (TAG_DONE),
-	(GA_Disabled), TRUE, (TAG_DONE),
-	(GA_Disabled), TRUE, (TAG_DONE),
-	(GTCY_Labels), (ULONG)&UserUploadProtocol_cycle2Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
-	(GTCY_Labels), (ULONG)&UserDownloadProtocol_cycle2Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
-	(GA_Disabled), TRUE, (TAG_DONE),
-	(GTCY_Labels), (ULONG)&UserEditor_cycle2Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
-	(GTCY_Labels), (ULONG)&UserCharSet_cycle2Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
-	(GTCY_Labels), (ULONG)&UserArchiver_cycle2Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
-	(GTCY_Labels), (ULONG)&UserNetmailPriv_cycle2Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
-	(GTCY_Labels), (ULONG)&UserMenuSet_cycle2Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
-	(GA_Disabled), TRUE, (TAG_DONE),
-	(GA_Disabled), TRUE, (TAG_DONE),
-	(GA_Disabled), TRUE, (TAG_DONE),
-	(GTCY_Labels), (ULONG)&UserUUCPPriv_cycle2Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
-	(GA_Disabled), TRUE, (TAG_DONE),
-	(GA_TabCycle), FALSE, (GTST_MaxChars), 11, (GA_Disabled), TRUE, (TAG_DONE),
-	(GA_TabCycle), FALSE, (GTST_MaxChars), 256, (GA_Disabled), TRUE, (TAG_DONE),
-	(GA_TabCycle), FALSE, (GTST_MaxChars), 26, (GA_Disabled), TRUE, (TAG_DONE),
-	(GA_TabCycle), FALSE, (GTIN_Number), 0, (GTIN_MaxChars), 3, (STRINGA_Justification), (GACT_STRINGCENTER), (GA_Disabled), TRUE, (TAG_DONE),
-	(GA_TabCycle), FALSE, (GTIN_Number), 0, (GTIN_MaxChars), 3, (STRINGA_Justification), (GACT_STRINGCENTER), (GA_Disabled), TRUE, (TAG_DONE),
-	(GA_Disabled), TRUE, (TAG_DONE),
-	(GTST_MaxChars), 30, (GA_Disabled), TRUE, (TAG_DONE),
-	(GTST_MaxChars), 35, (GA_Disabled), TRUE, (TAG_DONE),
-	(GTST_MaxChars), 25, (GA_Disabled), TRUE, (TAG_DONE),
-	(GTST_MaxChars), 23, (GA_Disabled), TRUE, (TAG_DONE),
-	(GTST_MaxChars), 5, (GA_Disabled), TRUE, (TAG_DONE),
-	(GTST_MaxChars), 7, (GA_Disabled), TRUE, (TAG_DONE),
-	(GTST_MaxChars), 24, (GA_Disabled), TRUE, (TAG_DONE),
-	(GTST_MaxChars), 14, (GA_Disabled), TRUE, (TAG_DONE),
-	(GTST_MaxChars), 39, (GA_Disabled), TRUE, (TAG_DONE),
-	(GTIN_Number), 0, (GTIN_MaxChars), 4, (STRINGA_Justification), (GACT_STRINGCENTER), (GA_Disabled), TRUE, (TAG_DONE),
-	(GTIN_Number), 0, (GTIN_MaxChars), 4, (STRINGA_Justification), (GACT_STRINGCENTER), (GA_Disabled), TRUE, (TAG_DONE),
-	(GTIN_Number), 0, (GTIN_MaxChars), 4, (STRINGA_Justification), (GACT_STRINGCENTER), (GA_Disabled), TRUE, (TAG_DONE),
-	(GTIN_Number), 0, (GTIN_MaxChars), 4, (STRINGA_Justification), (GACT_STRINGCENTER), (GA_Disabled), TRUE, (TAG_DONE),
-	(GTIN_Number), 0, (GTIN_MaxChars), 10, (STRINGA_Justification), (GACT_STRINGCENTER), (GA_Disabled), TRUE, (TAG_DONE),
-	(GTIN_Number), 0, (GTIN_MaxChars), 10, (STRINGA_Justification), (GACT_STRINGCENTER), (GA_Disabled), TRUE, (TAG_DONE),
-	(GTIN_Number), 0, (GTIN_MaxChars), 10, (STRINGA_Justification), (GACT_STRINGCENTER), (GA_Disabled), TRUE, (TAG_DONE),
-	(GTIN_Number), 0, (GTIN_MaxChars), 10, (STRINGA_Justification), (GACT_STRINGCENTER), (GA_Disabled), TRUE, (TAG_DONE),
-	(GTIN_Number), 0, (GTIN_MaxChars), 9, (STRINGA_Justification), (GACT_STRINGCENTER), (GA_Disabled), TRUE, (TAG_DONE),
-	(GTIN_Number), 0, (GTIN_MaxChars), 10, (STRINGA_Justification), (GACT_STRINGCENTER), (GA_Disabled), TRUE, (TAG_DONE),
-	(GTIN_Number), 0, (GTIN_MaxChars), 4, (STRINGA_Justification), (GACT_STRINGCENTER), (GA_Disabled), TRUE, (TAG_DONE),
-	(GTIN_Number), 0, (GTIN_MaxChars), 10, (STRINGA_Justification), (GACT_STRINGCENTER), (GA_Disabled), TRUE, (TAG_DONE),
-	(GTIN_Number), 0, (GTIN_MaxChars), 10, (STRINGA_Justification), (GACT_STRINGCENTER), (GA_Disabled), TRUE, (TAG_DONE),
-	(GTIN_Number), 0, (GTIN_MaxChars), 5, (STRINGA_Justification), (GACT_STRINGCENTER), (GA_Disabled), TRUE, (TAG_DONE),
-	(GTIN_Number), 0, (GTIN_MaxChars), 10, (STRINGA_Justification), (GACT_STRINGCENTER), (GA_Disabled), TRUE, (TAG_DONE),
-	(GTIN_Number), 0, (GTIN_MaxChars), 10, (STRINGA_Justification), (GACT_STRINGCENTER), (GA_Disabled), TRUE, (TAG_DONE),
-	(GTIN_Number), 0, (GTIN_MaxChars), 10, (STRINGA_Justification), (GACT_STRINGCENTER), (GA_Disabled), TRUE, (TAG_DONE)
+        (GTLV_ShowSelected), NULL, (TAG_DONE),
+        (GTCY_Labels), (ULONG)&UserTerminal_cycle2Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
+        (GTCY_Labels), (ULONG)&UserHelp_cycle2Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
+        (GA_Disabled), TRUE, (TAG_DONE),
+        (GTCY_Labels), (ULONG)&UserAccessLevel_cycle2Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
+        (GA_Disabled), TRUE, (TAG_DONE),
+        (GA_Disabled), TRUE, (TAG_DONE),
+        (GA_Disabled), TRUE, (TAG_DONE),
+        (GA_Disabled), TRUE, (TAG_DONE),
+        (GA_Disabled), TRUE, (TAG_DONE),
+        (GA_Disabled), TRUE, (TAG_DONE),
+        (GA_Disabled), TRUE, (TAG_DONE),
+        (GA_Disabled), TRUE, (TAG_DONE),
+        (GTCY_Labels), (ULONG)&UserUploadProtocol_cycle2Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
+        (GTCY_Labels), (ULONG)&UserDownloadProtocol_cycle2Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
+        (GA_Disabled), TRUE, (TAG_DONE),
+        (GTCY_Labels), (ULONG)&UserEditor_cycle2Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
+        (GTCY_Labels), (ULONG)&UserCharSet_cycle2Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
+        (GTCY_Labels), (ULONG)&UserArchiver_cycle2Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
+        (GTCY_Labels), (ULONG)&UserNetmailPriv_cycle2Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
+        (GTCY_Labels), (ULONG)&UserMenuSet_cycle2Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
+        (GA_Disabled), TRUE, (TAG_DONE),
+        (GA_Disabled), TRUE, (TAG_DONE),
+        (GA_Disabled), TRUE, (TAG_DONE),
+        (GTCY_Labels), (ULONG)&UserUUCPPriv_cycle2Labels[ 0 ], (GTCY_Active), 1, (GA_Disabled), TRUE, (TAG_DONE),
+        (GA_Disabled), TRUE, (TAG_DONE),
+        (GA_TabCycle), FALSE, (GTST_MaxChars), 11, (GA_Disabled), TRUE, (TAG_DONE),
+        (GA_TabCycle), FALSE, (GTST_MaxChars), 11, (GA_Disabled), TRUE, (TAG_DONE),
+        (GA_TabCycle), FALSE, (GTST_MaxChars), 26, (GA_Disabled), TRUE, (TAG_DONE),
+        (GA_TabCycle), FALSE, (GTIN_Number), 0, (GTIN_MaxChars), 3, (STRINGA_Justification), (GACT_STRINGCENTER), (GA_Disabled), TRUE, (TAG_DONE),
+        (GA_TabCycle), FALSE, (GTIN_Number), 0, (GTIN_MaxChars), 3, (STRINGA_Justification), (GACT_STRINGCENTER), (GA_Disabled), TRUE, (TAG_DONE),
+        (GA_Disabled), TRUE, (TAG_DONE),
+        (GTST_MaxChars), 30, (GA_Disabled), TRUE, (TAG_DONE),
+        (GTST_MaxChars), 35, (GA_Disabled), TRUE, (TAG_DONE),
+        (GTST_MaxChars), 25, (GA_Disabled), TRUE, (TAG_DONE),
+        (GTST_MaxChars), 23, (GA_Disabled), TRUE, (TAG_DONE),
+        (GTST_MaxChars), 5, (GA_Disabled), TRUE, (TAG_DONE),
+        (GTST_MaxChars), 7, (GA_Disabled), TRUE, (TAG_DONE),
+        (GTST_MaxChars), 24, (GA_Disabled), TRUE, (TAG_DONE),
+        (GTST_MaxChars), 14, (GA_Disabled), TRUE, (TAG_DONE),
+        (GTST_MaxChars), 39, (GA_Disabled), TRUE, (TAG_DONE),
+        (GTIN_Number), 0, (GTIN_MaxChars), 4, (STRINGA_Justification), (GACT_STRINGCENTER), (GA_Disabled), TRUE, (TAG_DONE),
+        (GTIN_Number), 0, (GTIN_MaxChars), 4, (STRINGA_Justification), (GACT_STRINGCENTER), (GA_Disabled), TRUE, (TAG_DONE),
+        (GTIN_Number), 0, (GTIN_MaxChars), 4, (STRINGA_Justification), (GACT_STRINGCENTER), (GA_Disabled), TRUE, (TAG_DONE),
+        (GTIN_Number), 0, (GTIN_MaxChars), 4, (STRINGA_Justification), (GACT_STRINGCENTER), (GA_Disabled), TRUE, (TAG_DONE),
+        (GTIN_Number), 0, (GTIN_MaxChars), 10, (STRINGA_Justification), (GACT_STRINGCENTER), (GA_Disabled), TRUE, (TAG_DONE),
+        (GTIN_Number), 0, (GTIN_MaxChars), 4, (STRINGA_Justification), (GACT_STRINGCENTER), (GA_Disabled), TRUE, (TAG_DONE),
+        (GTIN_Number), 0, (GTIN_MaxChars), 5, (STRINGA_Justification), (GACT_STRINGCENTER), (GA_Disabled), TRUE, (TAG_DONE),
+        (GTIN_Number), 0, (GTIN_MaxChars), 10, (STRINGA_Justification), (GACT_STRINGCENTER), (GA_Disabled), TRUE, (TAG_DONE),
+        (GTIN_Number), 0, (GTIN_MaxChars), 10, (STRINGA_Justification), (GACT_STRINGCENTER), (GA_Disabled), TRUE, (TAG_DONE),
+        (GTIN_Number), 0, (GTIN_MaxChars), 10, (STRINGA_Justification), (GACT_STRINGCENTER), (GA_Disabled), TRUE, (TAG_DONE),
+        (GTCY_Labels), (ULONG)&UserFileChooser_cycle2Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE),
+        (GTCY_Labels), (ULONG)&UserMsgChooser_cycle2Labels[ 0 ], (GA_Disabled), TRUE, (TAG_DONE)
 };
 
 ULONG Main_Status_DisplayGTags[] = {
-	(GT_Underscore), '_', (TAG_DONE),
-	(GT_Underscore), '_', (TAG_DONE),
-	(GT_Underscore), '_', (TAG_DONE)
+        (GT_Underscore), '_', (TAG_DONE),
+        (GT_Underscore), '_', (TAG_DONE),
+        (GT_Underscore), '_', (TAG_DONE)
 };
 
 ULONG FileAreaTemplateGTags[] = {
-	(TAG_DONE),
-	(TAG_DONE),
-	(GA_Disabled), TRUE, (TAG_DONE),
-	(GA_Disabled), TRUE, (TAG_DONE),
-	(GA_Disabled), TRUE, (TAG_DONE)
+        (GTLV_ShowSelected), NULL, (TAG_DONE),
+        (GTLV_ShowSelected), NULL, (TAG_DONE),
+        (GA_Disabled), TRUE, (TAG_DONE),
+        (TAG_DONE),
+        (GTCB_Checked), TRUE, (TAG_DONE),
+        (GTCB_Checked), TRUE, (TAG_DONE),
+        (GTCB_Checked), TRUE, (TAG_DONE),
+        (GTCB_Checked), TRUE, (TAG_DONE),
+        (GTCB_Checked), TRUE, (TAG_DONE),
+        (GTCB_Checked), TRUE, (TAG_DONE),
+        (GTCB_Checked), TRUE, (TAG_DONE),
+        (TAG_DONE),
+        (GTCB_Checked), TRUE, (GA_Disabled), TRUE, (TAG_DONE),
+        (GTCB_Checked), TRUE, (TAG_DONE),
+        (GTCB_Checked), TRUE, (TAG_DONE),
+        (GTCB_Checked), TRUE, (TAG_DONE)
 };
 
 ULONG MsgAreaTemplateGTags[] = {
-	(TAG_DONE),
-	(TAG_DONE),
-	(GA_Disabled), TRUE, (TAG_DONE),
-	(GA_Disabled), TRUE, (TAG_DONE),
-	(GA_Disabled), TRUE, (TAG_DONE)
+        (GTLV_ShowSelected), NULL, (TAG_DONE),
+        (GTLV_ShowSelected), NULL, (TAG_DONE),
+        (GA_Disabled), TRUE, (TAG_DONE),
+        (TAG_DONE),
+        (GTCB_Checked), TRUE, (TAG_DONE),
+        (GTCB_Checked), TRUE, (TAG_DONE),
+        (GTCB_Checked), TRUE, (TAG_DONE),
+        (GTCB_Checked), TRUE, (TAG_DONE),
+        (GTCB_Checked), TRUE, (TAG_DONE),
+        (GTCB_Checked), TRUE, (TAG_DONE),
+        (GTCB_Checked), TRUE, (TAG_DONE),
+        (GTCB_Checked), TRUE, (TAG_DONE),
+        (GTCB_Checked), TRUE, (GA_Disabled), TRUE, (TAG_DONE),
+        (GTCB_Checked), TRUE, (TAG_DONE),
+        (GTCB_Checked), TRUE, (TAG_DONE),
+        (GTCB_Checked), TRUE, (TAG_DONE),
+        (GTCB_Checked), TRUE, (TAG_DONE),
+        (GTCB_Checked), TRUE, (TAG_DONE)
+};
+
+ULONG FileUserAccessGTags[] = {
+        (GTLV_ShowSelected), NULL, (TAG_DONE),
+        (GTLV_ShowSelected), NULL, (TAG_DONE),
+        (GTLV_ShowSelected), NULL, (TAG_DONE),
+        (GTLV_ShowSelected), NULL, (TAG_DONE),
+        (GA_Disabled), TRUE, (TAG_DONE),
+        (TAG_DONE),
+        (GTTX_Text), (ULONG)"None", (GTTX_Border), TRUE, (TAG_DONE),
+        (GTTX_Text), (ULONG)"None", (GTTX_Border), TRUE, (TAG_DONE),
+        (GTMX_Labels), (ULONG)&FileUserAccessMX6Labels[ 0 ], (GTMX_Spacing), 5, (TAG_DONE)
 };
 
 static UWORD ComputeX( UWORD value )
 {
-	return(( UWORD )((( FontX * value ) + 3 ) / 6 ));
+        return(( UWORD )((( FontX * value ) + 4 ) / 8 ));
 }
 
 static UWORD ComputeY( UWORD value )
 {
-	return(( UWORD )((( FontY * value ) + 5 ) / 10 ));
+        return(( UWORD )((( FontY * value ) + 5 ) / 10 ));
 }
 
-static void ComputeFont( UWORD width, UWORD height )
-{
-	Forbid();
-	Font = &Attr;
-	Font->ta_Name = (STRPTR)GfxBase->DefaultFont->tf_Message.mn_Node.ln_Name;
-	Font->ta_YSize = FontY = GfxBase->DefaultFont->tf_YSize;
-	FontX = GfxBase->DefaultFont->tf_XSize;
-	Permit();
+static void ComputeFont(UWORD width, UWORD height) {
+    extern UBYTE *AppFontName;
+    extern UWORD AppFontXSize;
+    extern UWORD AppFontYSize;
 
-	OffX = Scr->WBorLeft;
-	OffY = Scr->RastPort.TxHeight + Scr->WBorTop + 1;
+        Font = &Attr;
+        Font->ta_Name = AppFontName;
+        Font->ta_YSize = FontY = AppFontYSize;
+        FontX = AppFontXSize;
 
-	if ( width && height ) {
-		if (( ComputeX( width ) + OffX + Scr->WBorRight ) > Scr->Width )
-			goto UseTopaz;
-		if (( ComputeY( height ) + OffY + Scr->WBorBottom ) > Scr->Height )
-			goto UseTopaz;
-	}
-	return;
+        OffX = Scr->WBorLeft;
+        OffY = Scr->RastPort.TxHeight + Scr->WBorTop + 1;
+
+        if ( width && height ) {
+                if (( ComputeX( width ) + OffX + Scr->WBorRight ) > Scr->Width )
+                        goto UseTopaz;
+                if (( ComputeY( height ) + OffY + Scr->WBorBottom ) > Scr->Height )
+                        goto UseTopaz;
+        }
+        return;
 
 UseTopaz:
-	Font->ta_Name = (STRPTR)"topaz.font";
-	FontX = FontY = Font->ta_YSize = 8;
+        Font->ta_Name = (STRPTR)"topaz.font";
+        FontX = FontY = Font->ta_YSize = 8;
 }
 
 int SetupScreen( void )
 {
-	if ( ! ( Scr = LockPubScreen( PubScreenName )))
-		return( 1L );
+        if ( ! ( Scr = LockPubScreen( PubScreenName )))
+                return( 1L );
 
-	ComputeFont( 0, 0 );
+        ComputeFont( 0, 0 );
 
-	if ( ! ( VisualInfo = GetVisualInfo( Scr, TAG_DONE )))
-		return( 2L );
+        if ( ! ( VisualInfo = GetVisualInfo( Scr, TAG_DONE )))
+                return( 2L );
 
-	return( 0L );
+        return( 0L );
 }
 
 void CloseDownScreen( void )
 {
-	if ( VisualInfo ) {
-		FreeVisualInfo( VisualInfo );
-		VisualInfo = NULL;
-	}
+        if ( VisualInfo ) {
+                FreeVisualInfo( VisualInfo );
+                VisualInfo = NULL;
+        }
 
-	if ( Scr        ) {
-		UnlockPubScreen( NULL, Scr );
-		Scr = NULL;
-	}
+        if ( Scr        ) {
+                UnlockPubScreen( NULL, Scr );
+                Scr = NULL;
+        }
 }
 
 void File_Area_ManagerRender( void )
 {
-	ComputeFont( File_Area_ManagerWidth, File_Area_ManagerHeight );
+        ComputeFont( File_Area_ManagerWidth, File_Area_ManagerHeight );
 
-	DrawBevelBox( File_Area_ManagerWnd->RPort, OffX + ComputeX( 10 ),
-					OffY + ComputeY( 197 ),
-					ComputeX( 113 ),
-					ComputeY( 30 ),
-					GT_VisualInfo, VisualInfo, TAG_DONE );
-	DrawBevelBox( File_Area_ManagerWnd->RPort, OffX + ComputeX( 10 ),
-					OffY + ComputeY( 128 ),
-					ComputeX( 113 ),
-					ComputeY( 67 ),
-					GT_VisualInfo, VisualInfo, GTBB_Recessed, TRUE, TAG_DONE );
+        DrawBevelBox( File_Area_ManagerWnd->RPort, OffX + ComputeX( 4 ),
+                                        OffY + ComputeY( 131 ),
+                                        ComputeX( 141 ),
+                                        ComputeY( 86 ),
+                                        GT_VisualInfo, VisualInfo, GTBB_Recessed, TRUE, TAG_DONE );
 }
 
 int HandleFile_Area_ManagerIDCMP( void )
 {
-	struct IntuiMessage	*m;
-	int			(*func)();
-	BOOL			running = TRUE;
+        struct IntuiMessage     *m;
+        int                     (*func)();
+        BOOL                    running = TRUE;
 
-	while( m = GT_GetIMsg( File_Area_ManagerWnd->UserPort )) {
+        while( m = GT_GetIMsg( File_Area_ManagerWnd->UserPort )) {
 
-		CopyMem(( char * )m, ( char * )&File_Area_ManagerMsg, (long)sizeof( struct IntuiMessage ));
+                CopyMem(( char * )m, ( char * )&File_Area_ManagerMsg, (long)sizeof( struct IntuiMessage ));
 
-		GT_ReplyIMsg( m );
+                GT_ReplyIMsg( m );
 
-		switch ( File_Area_ManagerMsg.Class ) {
+                switch ( File_Area_ManagerMsg.Class ) {
 
-			case	IDCMP_REFRESHWINDOW:
-				GT_BeginRefresh( File_Area_ManagerWnd );
-				File_Area_ManagerRender();
-				GT_EndRefresh( File_Area_ManagerWnd, TRUE );
-				break;
+                        case    IDCMP_REFRESHWINDOW:
+                                GT_BeginRefresh( File_Area_ManagerWnd );
+                                File_Area_ManagerRender();
+                                GT_EndRefresh( File_Area_ManagerWnd, TRUE );
+                                break;
 
-			case	IDCMP_CLOSEWINDOW:
-				running = File_Area_ManagerCloseWindow();
-				break;
+                        case    IDCMP_CLOSEWINDOW:
+                                running = File_Area_ManagerCloseWindow();
+                                break;
 
-			case	IDCMP_RAWKEY:
-				running = File_Area_ManagerRawKey();
-				break;
+                        case    IDCMP_RAWKEY:
+                                running = File_Area_ManagerRawKey();
+                                break;
 
-			case	IDCMP_GADGETUP:
-			case	IDCMP_GADGETDOWN:
-				func = ( void * )(( struct Gadget * )File_Area_ManagerMsg.IAddress )->UserData;
-				running = func();
-				break;
-		}
-	}
-	return( running );
+                        case    IDCMP_GADGETUP:
+                        case    IDCMP_GADGETDOWN:
+                                func = ( void * )(( struct Gadget * )File_Area_ManagerMsg.IAddress )->UserData;
+                                running = func();
+                                break;
+                }
+        }
+        return( running );
 }
 
 int OpenFile_Area_ManagerWindow( void )
 {
-	struct NewGadget	ng;
-	struct Gadget	*g;
-	UWORD		lc, tc;
-	UWORD		wleft = File_Area_ManagerLeft, wtop = File_Area_ManagerTop, ww, wh;
+        struct NewGadget        ng;
+        struct Gadget   *g;
+        UWORD           lc, tc;
+        UWORD           wleft = File_Area_ManagerLeft, wtop = File_Area_ManagerTop, ww, wh;
 
-	ComputeFont( File_Area_ManagerWidth, File_Area_ManagerHeight );
+        ComputeFont( File_Area_ManagerWidth, File_Area_ManagerHeight );
 
-	ww = ComputeX( File_Area_ManagerWidth );
-	wh = ComputeY( File_Area_ManagerHeight );
+        ww = ComputeX( File_Area_ManagerWidth );
+        wh = ComputeY( File_Area_ManagerHeight );
 
-	if (( wleft + ww + OffX + Scr->WBorRight ) > Scr->Width ) wleft = Scr->Width - ww;
-	if (( wtop + wh + OffY + Scr->WBorBottom ) > Scr->Height ) wtop = Scr->Height - wh;
+        if (( wleft + ww + OffX + Scr->WBorRight ) > Scr->Width ) wleft = Scr->Width - ww;
+        if (( wtop + wh + OffY + Scr->WBorBottom ) > Scr->Height ) wtop = Scr->Height - wh;
 
-	if ( ! ( File_Area_ManagerFont = OpenDiskFont( Font )))
-		return( 5L );
+        if ( ! ( g = CreateContext( &File_Area_ManagerGList )))
+                return( 1L );
 
-	if ( ! ( g = CreateContext( &File_Area_ManagerGList )))
-		return( 1L );
+        for( lc = 0, tc = 0; lc < File_Area_Manager_CNT; lc++ ) {
 
-	for( lc = 0, tc = 0; lc < File_Area_Manager_CNT; lc++ ) {
+                CopyMem((char * )&File_Area_ManagerNGad[ lc ], (char * )&ng, (long)sizeof( struct NewGadget ));
 
-		CopyMem((char * )&File_Area_ManagerNGad[ lc ], (char * )&ng, (long)sizeof( struct NewGadget ));
+                ng.ng_VisualInfo = VisualInfo;
+                ng.ng_TextAttr   = Font;
+                ng.ng_LeftEdge   = OffX + ComputeX( ng.ng_LeftEdge );
+                ng.ng_TopEdge    = OffY + ComputeY( ng.ng_TopEdge );
+                ng.ng_Width      = ComputeX( ng.ng_Width );
+                ng.ng_Height     = ComputeY( ng.ng_Height);
 
-		ng.ng_VisualInfo = VisualInfo;
-		ng.ng_TextAttr   = Font;
-		ng.ng_LeftEdge   = OffX + ComputeX( ng.ng_LeftEdge );
-		ng.ng_TopEdge    = OffY + ComputeY( ng.ng_TopEdge );
-		ng.ng_Width      = ComputeX( ng.ng_Width );
-		ng.ng_Height     = ComputeY( ng.ng_Height);
+                File_Area_ManagerGadgets[ lc ] = g = CreateGadgetA((ULONG)File_Area_ManagerGTypes[ lc ], g, &ng, ( struct TagItem * )&File_Area_ManagerGTags[ tc ] );
 
-		File_Area_ManagerGadgets[ lc ] = g = CreateGadgetA((ULONG)File_Area_ManagerGTypes[ lc ], g, &ng, ( struct TagItem * )&File_Area_ManagerGTags[ tc ] );
+                while( File_Area_ManagerGTags[ tc ] ) tc += 2;
+                tc++;
 
-		while( File_Area_ManagerGTags[ tc ] ) tc += 2;
-		tc++;
+                if ( NOT g )
+                        return( 2L );
+        }
 
-		if ( NOT g )
-			return( 2L );
-	}
+        if ( ! ( File_Area_ManagerWnd = OpenWindowTags( NULL,
+                                WA_Left,        wleft,
+                                WA_Top,         wtop,
+                                WA_Width,       ww + OffX + Scr->WBorRight,
+                                WA_Height,      wh + OffY + Scr->WBorBottom,
+                                WA_IDCMP,       LISTVIEWIDCMP|BUTTONIDCMP|CHECKBOXIDCMP|CYCLEIDCMP|STRINGIDCMP|INTEGERIDCMP|IDCMP_CLOSEWINDOW|IDCMP_RAWKEY|IDCMP_REFRESHWINDOW,
+                                WA_Flags,       WFLG_DRAGBAR|WFLG_DEPTHGADGET|WFLG_CLOSEGADGET|WFLG_SIZEBBOTTOM|WFLG_SMART_REFRESH|WFLG_ACTIVATE,
+                                WA_Gadgets,     File_Area_ManagerGList,
+                                WA_Title,       File_Area_ManagerWdt,
+                                WA_PubScreen,   Scr,
+                                WA_AutoAdjust,  TRUE,
+                                TAG_DONE )))
+        return( 4L );
 
-	if ( ! ( File_Area_ManagerWnd = OpenWindowTags( NULL,
-				WA_Left,	wleft,
-				WA_Top,		wtop,
-				WA_Width,	ww + OffX + Scr->WBorRight,
-				WA_Height,	wh + OffY + Scr->WBorBottom,
-				WA_IDCMP,	LISTVIEWIDCMP|BUTTONIDCMP|CHECKBOXIDCMP|CYCLEIDCMP|STRINGIDCMP|INTEGERIDCMP|IDCMP_CLOSEWINDOW|IDCMP_RAWKEY|IDCMP_REFRESHWINDOW,
-				WA_Flags,	WFLG_DRAGBAR|WFLG_DEPTHGADGET|WFLG_CLOSEGADGET|WFLG_SMART_REFRESH|WFLG_ACTIVATE,
-				WA_Gadgets,	File_Area_ManagerGList,
-				WA_Title,	File_Area_ManagerWdt,
-				WA_ScreenTitle,	"DLG-Edit (File Area Manager)",
-				TAG_DONE )))
-	return( 4L );
+        GT_RefreshWindow( File_Area_ManagerWnd, NULL );
 
-	GT_RefreshWindow( File_Area_ManagerWnd, NULL );
+        File_Area_ManagerRender();
 
-	File_Area_ManagerRender();
-
-	return( 0L );
+        return( 0L );
 }
 
 void CloseFile_Area_ManagerWindow( void )
 {
-	if ( File_Area_ManagerWnd        ) {
-		CloseWindow( File_Area_ManagerWnd );
-		File_Area_ManagerWnd = NULL;
-	}
+        if ( File_Area_ManagerWnd        ) {
+                CloseWindow( File_Area_ManagerWnd );
+                File_Area_ManagerWnd = NULL;
+        }
 
-	if ( File_Area_ManagerGList      ) {
-		FreeGadgets( File_Area_ManagerGList );
-		File_Area_ManagerGList = NULL;
-	}
-
-	if ( File_Area_ManagerFont ) {
-		CloseFont( File_Area_ManagerFont );
-		File_Area_ManagerFont = NULL;
-	}
+        if ( File_Area_ManagerGList      ) {
+                FreeGadgets( File_Area_ManagerGList );
+                File_Area_ManagerGList = NULL;
+        }
 }
 
 void Message_Area_ManagerRender( void )
 {
-	ComputeFont( Message_Area_ManagerWidth, Message_Area_ManagerHeight );
+        ComputeFont( Message_Area_ManagerWidth, Message_Area_ManagerHeight );
 
-	DrawBevelBox( Message_Area_ManagerWnd->RPort, OffX + ComputeX( 20 ),
-					OffY + ComputeY( 213 ),
-					ComputeX( 109 ),
-					ComputeY( 33 ),
-					GT_VisualInfo, VisualInfo, TAG_DONE );
-	DrawBevelBox( Message_Area_ManagerWnd->RPort, OffX + ComputeX( 18 ),
-					OffY + ComputeY( 122 ),
-					ComputeX( 113 ),
-					ComputeY( 88 ),
-					GT_VisualInfo, VisualInfo, GTBB_Recessed, TRUE, TAG_DONE );
+        DrawBevelBox( Message_Area_ManagerWnd->RPort, OffX + ComputeX( 4 ),
+                                        OffY + ComputeY( 151 ),
+                                        ComputeX( 141 ),
+                                        ComputeY( 101 ),
+                                        GT_VisualInfo, VisualInfo, GTBB_Recessed, TRUE, TAG_DONE );
+        DrawBevelBox( Message_Area_ManagerWnd->RPort, OffX + ComputeX( 4 ),
+                                        OffY + ComputeY( 256 ),
+                                        ComputeX( 245 ),
+                                        ComputeY( 46 ),
+                                        GT_VisualInfo, VisualInfo, GTBB_Recessed, TRUE, TAG_DONE );
 }
 
 int HandleMessage_Area_ManagerIDCMP( void )
 {
-	struct IntuiMessage	*m;
-	int			(*func)();
-	BOOL			running = TRUE;
+        struct IntuiMessage     *m;
+        int                     (*func)();
+        BOOL                    running = TRUE;
 
-	while( m = GT_GetIMsg( Message_Area_ManagerWnd->UserPort )) {
+        while( m = GT_GetIMsg( Message_Area_ManagerWnd->UserPort )) {
 
-		CopyMem(( char * )m, ( char * )&Message_Area_ManagerMsg, (long)sizeof( struct IntuiMessage ));
+                CopyMem(( char * )m, ( char * )&Message_Area_ManagerMsg, (long)sizeof( struct IntuiMessage ));
 
-		GT_ReplyIMsg( m );
+                GT_ReplyIMsg( m );
 
-		switch ( Message_Area_ManagerMsg.Class ) {
+                switch ( Message_Area_ManagerMsg.Class ) {
 
-			case	IDCMP_REFRESHWINDOW:
-				GT_BeginRefresh( Message_Area_ManagerWnd );
-				Message_Area_ManagerRender();
-				GT_EndRefresh( Message_Area_ManagerWnd, TRUE );
-				break;
+                        case    IDCMP_REFRESHWINDOW:
+                                GT_BeginRefresh( Message_Area_ManagerWnd );
+                                Message_Area_ManagerRender();
+                                GT_EndRefresh( Message_Area_ManagerWnd, TRUE );
+                                break;
 
-			case	IDCMP_CLOSEWINDOW:
-				running = Message_Area_ManagerCloseWindow();
-				break;
+                        case    IDCMP_CLOSEWINDOW:
+                                running = Message_Area_ManagerCloseWindow();
+                                break;
 
-			case	IDCMP_RAWKEY:
-				running = Message_Area_ManagerRawKey();
-				break;
+                        case    IDCMP_RAWKEY:
+                                running = Message_Area_ManagerRawKey();
+                                break;
 
-			case	IDCMP_GADGETUP:
-			case	IDCMP_GADGETDOWN:
-				func = ( void * )(( struct Gadget * )Message_Area_ManagerMsg.IAddress )->UserData;
-				running = func();
-				break;
-		}
-	}
-	return( running );
+                        case    IDCMP_GADGETUP:
+                        case    IDCMP_GADGETDOWN:
+                                func = ( void * )(( struct Gadget * )Message_Area_ManagerMsg.IAddress )->UserData;
+                                running = func();
+                                break;
+                }
+        }
+        return( running );
 }
 
 int OpenMessage_Area_ManagerWindow( void )
 {
-	struct NewGadget	ng;
-	struct Gadget	*g;
-	UWORD		lc, tc;
-	UWORD		wleft = Message_Area_ManagerLeft, wtop = Message_Area_ManagerTop, ww, wh;
+        struct NewGadget        ng;
+        struct Gadget   *g;
+        UWORD           lc, tc;
+        UWORD           wleft = Message_Area_ManagerLeft, wtop = Message_Area_ManagerTop, ww, wh;
 
-	ComputeFont( Message_Area_ManagerWidth, Message_Area_ManagerHeight );
+        ComputeFont( Message_Area_ManagerWidth, Message_Area_ManagerHeight );
 
-	ww = ComputeX( Message_Area_ManagerWidth );
-	wh = ComputeY( Message_Area_ManagerHeight );
+        ww = ComputeX( Message_Area_ManagerWidth );
+        wh = ComputeY( Message_Area_ManagerHeight );
 
-	if (( wleft + ww + OffX + Scr->WBorRight ) > Scr->Width ) wleft = Scr->Width - ww;
-	if (( wtop + wh + OffY + Scr->WBorBottom ) > Scr->Height ) wtop = Scr->Height - wh;
+        if (( wleft + ww + OffX + Scr->WBorRight ) > Scr->Width ) wleft = Scr->Width - ww;
+        if (( wtop + wh + OffY + Scr->WBorBottom ) > Scr->Height ) wtop = Scr->Height - wh;
 
-	if ( ! ( Message_Area_ManagerFont = OpenDiskFont( Font )))
-		return( 5L );
+        if ( ! ( g = CreateContext( &Message_Area_ManagerGList )))
+                return( 1L );
 
-	if ( ! ( g = CreateContext( &Message_Area_ManagerGList )))
-		return( 1L );
+        for( lc = 0, tc = 0; lc < Message_Area_Manager_CNT; lc++ ) {
 
-	for( lc = 0, tc = 0; lc < Message_Area_Manager_CNT; lc++ ) {
+                CopyMem((char * )&Message_Area_ManagerNGad[ lc ], (char * )&ng, (long)sizeof( struct NewGadget ));
 
-		CopyMem((char * )&Message_Area_ManagerNGad[ lc ], (char * )&ng, (long)sizeof( struct NewGadget ));
+                ng.ng_VisualInfo = VisualInfo;
+                ng.ng_TextAttr   = Font;
+                ng.ng_LeftEdge   = OffX + ComputeX( ng.ng_LeftEdge );
+                ng.ng_TopEdge    = OffY + ComputeY( ng.ng_TopEdge );
+                ng.ng_Width      = ComputeX( ng.ng_Width );
+                ng.ng_Height     = ComputeY( ng.ng_Height);
 
-		ng.ng_VisualInfo = VisualInfo;
-		ng.ng_TextAttr   = Font;
-		ng.ng_LeftEdge   = OffX + ComputeX( ng.ng_LeftEdge );
-		ng.ng_TopEdge    = OffY + ComputeY( ng.ng_TopEdge );
-		ng.ng_Width      = ComputeX( ng.ng_Width );
-		ng.ng_Height     = ComputeY( ng.ng_Height);
+                Message_Area_ManagerGadgets[ lc ] = g = CreateGadgetA((ULONG)Message_Area_ManagerGTypes[ lc ], g, &ng, ( struct TagItem * )&Message_Area_ManagerGTags[ tc ] );
 
-		Message_Area_ManagerGadgets[ lc ] = g = CreateGadgetA((ULONG)Message_Area_ManagerGTypes[ lc ], g, &ng, ( struct TagItem * )&Message_Area_ManagerGTags[ tc ] );
+                while( Message_Area_ManagerGTags[ tc ] ) tc += 2;
+                tc++;
 
-		while( Message_Area_ManagerGTags[ tc ] ) tc += 2;
-		tc++;
+                if ( NOT g )
+                        return( 2L );
+        }
 
-		if ( NOT g )
-			return( 2L );
-	}
+        if ( ! ( Message_Area_ManagerWnd = OpenWindowTags( NULL,
+                                WA_Left,        wleft,
+                                WA_Top,         wtop,
+                                WA_Width,       ww + OffX + Scr->WBorRight,
+                                WA_Height,      wh + OffY + Scr->WBorBottom,
+                                WA_IDCMP,       LISTVIEWIDCMP|BUTTONIDCMP|CHECKBOXIDCMP|CYCLEIDCMP|STRINGIDCMP|INTEGERIDCMP|IDCMP_CLOSEWINDOW|IDCMP_RAWKEY|IDCMP_REFRESHWINDOW,
+                                WA_Flags,       WFLG_DRAGBAR|WFLG_DEPTHGADGET|WFLG_CLOSEGADGET|WFLG_SIZEBBOTTOM|WFLG_SMART_REFRESH|WFLG_REPORTMOUSE|WFLG_ACTIVATE,
+                                WA_Gadgets,     Message_Area_ManagerGList,
+                                WA_Title,       Message_Area_ManagerWdt,
+                                WA_PubScreen,   Scr,
+                                WA_AutoAdjust,  TRUE,
+                                TAG_DONE )))
+        return( 4L );
 
-	if ( ! ( Message_Area_ManagerWnd = OpenWindowTags( NULL,
-				WA_Left,	wleft,
-				WA_Top,		wtop,
-				WA_Width,	ww + OffX + Scr->WBorRight,
-				WA_Height,	wh + OffY + Scr->WBorBottom,
-				WA_IDCMP,	LISTVIEWIDCMP|BUTTONIDCMP|CHECKBOXIDCMP|SLIDERIDCMP|CYCLEIDCMP|STRINGIDCMP|INTEGERIDCMP|IDCMP_CLOSEWINDOW|IDCMP_RAWKEY|IDCMP_REFRESHWINDOW,
-				WA_Flags,	WFLG_DRAGBAR|WFLG_DEPTHGADGET|WFLG_CLOSEGADGET|WFLG_SMART_REFRESH|WFLG_REPORTMOUSE|WFLG_ACTIVATE,
-				WA_Gadgets,	Message_Area_ManagerGList,
-				WA_Title,	Message_Area_ManagerWdt,
-				WA_ScreenTitle,	"DLG-Edit (Message Area Manager)",
-				TAG_DONE )))
-	return( 4L );
+        GT_RefreshWindow( Message_Area_ManagerWnd, NULL );
 
-	GT_RefreshWindow( Message_Area_ManagerWnd, NULL );
+        Message_Area_ManagerRender();
 
-	Message_Area_ManagerRender();
-
-	return( 0L );
+        return( 0L );
 }
 
 void CloseMessage_Area_ManagerWindow( void )
 {
-	if ( Message_Area_ManagerWnd        ) {
-		CloseWindow( Message_Area_ManagerWnd );
-		Message_Area_ManagerWnd = NULL;
-	}
+        if ( Message_Area_ManagerWnd        ) {
+                CloseWindow( Message_Area_ManagerWnd );
+                Message_Area_ManagerWnd = NULL;
+        }
 
-	if ( Message_Area_ManagerGList      ) {
-		FreeGadgets( Message_Area_ManagerGList );
-		Message_Area_ManagerGList = NULL;
-	}
-
-	if ( Message_Area_ManagerFont ) {
-		CloseFont( Message_Area_ManagerFont );
-		Message_Area_ManagerFont = NULL;
-	}
+        if ( Message_Area_ManagerGList      ) {
+                FreeGadgets( Message_Area_ManagerGList );
+                Message_Area_ManagerGList = NULL;
+        }
 }
 
 void User_EditorRender( void )
 {
-	struct IntuiText	it;
-	UWORD			cnt;
+        struct IntuiText        it;
+        UWORD                   cnt;
 
-	ComputeFont( User_EditorWidth, User_EditorHeight );
+        ComputeFont( User_EditorWidth, User_EditorHeight );
 
-	DrawBevelBox( User_EditorWnd->RPort, OffX + ComputeX( 468 ),
-					OffY + ComputeY( 344 ),
-					ComputeX( 77 ),
-					ComputeY( 31 ),
-					GT_VisualInfo, VisualInfo, TAG_DONE );
-	DrawBevelBox( User_EditorWnd->RPort, OffX + ComputeX( 227 ),
-					OffY + ComputeY( 94 ),
-					ComputeX( 147 ),
-					ComputeY( 56 ),
-					GT_VisualInfo, VisualInfo, TAG_DONE );
-	DrawBevelBox( User_EditorWnd->RPort, OffX + ComputeX( 227 ),
-					OffY + ComputeY( 7 ),
-					ComputeX( 147 ),
-					ComputeY( 87 ),
-					GT_VisualInfo, VisualInfo, TAG_DONE );
-	DrawBevelBox( User_EditorWnd->RPort, OffX + ComputeX( 386 ),
-					OffY + ComputeY( 135 ),
-					ComputeX( 157 ),
-					ComputeY( 99 ),
-					GT_VisualInfo, VisualInfo, TAG_DONE );
-	DrawBevelBox( User_EditorWnd->RPort, OffX + ComputeX( 384 ),
-					OffY + ComputeY( 134 ),
-					ComputeX( 161 ),
-					ComputeY( 101 ),
-					GT_VisualInfo, VisualInfo, GTBB_Recessed, TRUE, TAG_DONE );
-	DrawBevelBox( User_EditorWnd->RPort, OffX + ComputeX( 386 ),
-					OffY + ComputeY( 7 ),
-					ComputeX( 157 ),
-					ComputeY( 118 ),
-					GT_VisualInfo, VisualInfo, TAG_DONE );
-	DrawBevelBox( User_EditorWnd->RPort, OffX + ComputeX( 384 ),
-					OffY + ComputeY( 6 ),
-					ComputeX( 161 ),
-					ComputeY( 120 ),
-					GT_VisualInfo, VisualInfo, GTBB_Recessed, TRUE, TAG_DONE );
-	DrawBevelBox( User_EditorWnd->RPort, OffX + ComputeX( 225 ),
-					OffY + ComputeY( 6 ),
-					ComputeX( 151 ),
-					ComputeY( 145 ),
-					GT_VisualInfo, VisualInfo, GTBB_Recessed, TRUE, TAG_DONE );
+        DrawBevelBox( User_EditorWnd->RPort, OffX + ComputeX( 492 ),
+                                        OffY + ComputeY( 276 ),
+                                        ComputeX( 137 ),
+                                        ComputeY( 56 ),
+                                        GT_VisualInfo, VisualInfo, GTBB_Recessed, TRUE, TAG_DONE );
+        DrawBevelBox( User_EditorWnd->RPort, OffX + ComputeX( 276 ),
+                                        OffY + ComputeY( 111 ),
+                                        ComputeX( 153 ),
+                                        ComputeY( 71 ),
+                                        GT_VisualInfo, VisualInfo, GTBB_Recessed, TRUE, TAG_DONE );
+        DrawBevelBox( User_EditorWnd->RPort, OffX + ComputeX( 436 ),
+                                        OffY + ComputeY( 6 ),
+                                        ComputeX( 193 ),
+                                        ComputeY( 181 ),
+                                        GT_VisualInfo, VisualInfo, GTBB_Recessed, TRUE, TAG_DONE );
+        DrawBevelBox( User_EditorWnd->RPort, OffX + ComputeX( 276 ),
+                                        OffY + ComputeY( 6 ),
+                                        ComputeX( 153 ),
+                                        ComputeY( 176 ),
+                                        GT_VisualInfo, VisualInfo, GTBB_Recessed, TRUE, TAG_DONE );
+        DrawBevelBox( User_EditorWnd->RPort, OffX + ComputeX( 436 ),
+                                        OffY + ComputeY( 81 ),
+                                        ComputeX( 193 ),
+                                        ComputeY( 106 ),
+                                        GT_VisualInfo, VisualInfo, GTBB_Recessed, TRUE, TAG_DONE );
 
-	for ( cnt = 0; cnt < User_Editor_TNUM; cnt++ ) {
-		CopyMem(( char * )&User_EditorIText[ cnt ], ( char * )&it, (long)sizeof( struct IntuiText ));
-		it.ITextFont = Font;
-		it.LeftEdge  = OffX + ComputeX( it.LeftEdge ) - ( IntuiTextLength( &it ) >> 1 );
-		it.TopEdge   = OffY + ComputeY( it.TopEdge ) - ( Font->ta_YSize >> 1 );
-		PrintIText( User_EditorWnd->RPort, &it, 0, 0 );
-	}
+        for ( cnt = 0; cnt < User_Editor_TNUM; cnt++ ) {
+                CopyMem(( char * )&User_EditorIText[ cnt ], ( char * )&it, (long)sizeof( struct IntuiText ));
+                it.ITextFont = Font;
+                it.LeftEdge  = OffX + ComputeX( it.LeftEdge ) - ( IntuiTextLength( &it ) >> 1 );
+                it.TopEdge   = OffY + ComputeY( it.TopEdge ) - ( Font->ta_YSize >> 1 );
+                PrintIText( User_EditorWnd->RPort, &it, 0, 0 );
+        }
 }
 
 int HandleUser_EditorIDCMP( void )
 {
-	struct IntuiMessage	*m;
-	int			(*func)();
-	BOOL			running = TRUE;
+        struct IntuiMessage     *m;
+        int                     (*func)();
+        BOOL                    running = TRUE;
 
-	while( m = GT_GetIMsg( User_EditorWnd->UserPort )) {
+        while( m = GT_GetIMsg( User_EditorWnd->UserPort )) {
 
-		CopyMem(( char * )m, ( char * )&User_EditorMsg, (long)sizeof( struct IntuiMessage ));
+                CopyMem(( char * )m, ( char * )&User_EditorMsg, (long)sizeof( struct IntuiMessage ));
 
-		GT_ReplyIMsg( m );
+                GT_ReplyIMsg( m );
 
-		switch ( User_EditorMsg.Class ) {
+                switch ( User_EditorMsg.Class ) {
 
-			case	IDCMP_REFRESHWINDOW:
-				GT_BeginRefresh( User_EditorWnd );
-				User_EditorRender();
-				GT_EndRefresh( User_EditorWnd, TRUE );
-				break;
+                        case    IDCMP_REFRESHWINDOW:
+                                GT_BeginRefresh( User_EditorWnd );
+                                User_EditorRender();
+                                GT_EndRefresh( User_EditorWnd, TRUE );
+                                break;
 
-			case	IDCMP_CLOSEWINDOW:
-				running = User_EditorCloseWindow();
-				break;
+                        case    IDCMP_CLOSEWINDOW:
+                                running = User_EditorCloseWindow();
+                                break;
 
-			case	IDCMP_GADGETUP:
-			case	IDCMP_GADGETDOWN:
-				func = ( void * )(( struct Gadget * )User_EditorMsg.IAddress )->UserData;
-				running = func();
-				break;
-		}
-	}
-	return( running );
+                        case    IDCMP_GADGETUP:
+                        case    IDCMP_GADGETDOWN:
+                                func = ( void * )(( struct Gadget * )User_EditorMsg.IAddress )->UserData;
+                                running = func();
+                                break;
+                }
+        }
+        return( running );
 }
 
 int OpenUser_EditorWindow( void )
 {
-	struct NewGadget	ng;
-	struct Gadget	*g;
-	UWORD		lc, tc;
-	UWORD		wleft = User_EditorLeft, wtop = User_EditorTop, ww, wh;
+        struct NewGadget        ng;
+        struct Gadget   *g;
+        UWORD           lc, tc;
+        UWORD           wleft = User_EditorLeft, wtop = User_EditorTop, ww, wh;
 
-	ComputeFont( User_EditorWidth, User_EditorHeight );
+        ComputeFont( User_EditorWidth, User_EditorHeight );
 
-	ww = ComputeX( User_EditorWidth );
-	wh = ComputeY( User_EditorHeight );
+        ww = ComputeX( User_EditorWidth );
+        wh = ComputeY( User_EditorHeight );
 
-	if (( wleft + ww + OffX + Scr->WBorRight ) > Scr->Width ) wleft = Scr->Width - ww;
-	if (( wtop + wh + OffY + Scr->WBorBottom ) > Scr->Height ) wtop = Scr->Height - wh;
+        if (( wleft + ww + OffX + Scr->WBorRight ) > Scr->Width ) wleft = Scr->Width - ww;
+        if (( wtop + wh + OffY + Scr->WBorBottom ) > Scr->Height ) wtop = Scr->Height - wh;
 
-	if ( ! ( User_EditorFont = OpenDiskFont( Font )))
-		return( 5L );
+        if ( ! ( g = CreateContext( &User_EditorGList )))
+                return( 1L );
 
-	if ( ! ( g = CreateContext( &User_EditorGList )))
-		return( 1L );
+        for( lc = 0, tc = 0; lc < User_Editor_CNT; lc++ ) {
 
-	for( lc = 0, tc = 0; lc < User_Editor_CNT; lc++ ) {
+                CopyMem((char * )&User_EditorNGad[ lc ], (char * )&ng, (long)sizeof( struct NewGadget ));
 
-		CopyMem((char * )&User_EditorNGad[ lc ], (char * )&ng, (long)sizeof( struct NewGadget ));
+                ng.ng_VisualInfo = VisualInfo;
+                ng.ng_TextAttr   = Font;
+                ng.ng_LeftEdge   = OffX + ComputeX( ng.ng_LeftEdge );
+                ng.ng_TopEdge    = OffY + ComputeY( ng.ng_TopEdge );
+                ng.ng_Width      = ComputeX( ng.ng_Width );
+                ng.ng_Height     = ComputeY( ng.ng_Height);
 
-		ng.ng_VisualInfo = VisualInfo;
-		ng.ng_TextAttr   = Font;
-		ng.ng_LeftEdge   = OffX + ComputeX( ng.ng_LeftEdge );
-		ng.ng_TopEdge    = OffY + ComputeY( ng.ng_TopEdge );
-		ng.ng_Width      = ComputeX( ng.ng_Width );
-		ng.ng_Height     = ComputeY( ng.ng_Height);
+                User_EditorGadgets[ lc ] = g = CreateGadgetA((ULONG)User_EditorGTypes[ lc ], g, &ng, ( struct TagItem * )&User_EditorGTags[ tc ] );
 
-		User_EditorGadgets[ lc ] = g = CreateGadgetA((ULONG)User_EditorGTypes[ lc ], g, &ng, ( struct TagItem * )&User_EditorGTags[ tc ] );
+                while( User_EditorGTags[ tc ] ) tc += 2;
+                tc++;
 
-		while( User_EditorGTags[ tc ] ) tc += 2;
-		tc++;
+                if ( NOT g )
+                        return( 2L );
+        }
 
-		if ( NOT g )
-			return( 2L );
-	}
+        if ( ! ( User_EditorWnd = OpenWindowTags( NULL,
+                                WA_Left,        wleft,
+                                WA_Top,         wtop,
+                                WA_Width,       ww + OffX + Scr->WBorRight,
+                                WA_Height,      wh + OffY + Scr->WBorBottom,
+                                WA_IDCMP,       LISTVIEWIDCMP|CYCLEIDCMP|CHECKBOXIDCMP|BUTTONIDCMP|STRINGIDCMP|INTEGERIDCMP|IDCMP_CLOSEWINDOW|IDCMP_REFRESHWINDOW,
+                                WA_Flags,       WFLG_DRAGBAR|WFLG_DEPTHGADGET|WFLG_CLOSEGADGET|WFLG_SIZEBBOTTOM|WFLG_SMART_REFRESH|WFLG_ACTIVATE,
+                                WA_Gadgets,     User_EditorGList,
+                                WA_Title,       User_EditorWdt,
+                                WA_PubScreen,   Scr,
+                                WA_AutoAdjust,  TRUE,
+                                TAG_DONE )))
+        return( 4L );
 
-	if ( ! ( User_EditorWnd = OpenWindowTags( NULL,
-				WA_Left,	wleft,
-				WA_Top,		wtop,
-				WA_Width,	ww + OffX + Scr->WBorRight,
-				WA_Height,	wh + OffY + Scr->WBorBottom,
-				WA_IDCMP,	LISTVIEWIDCMP|CYCLEIDCMP|CHECKBOXIDCMP|BUTTONIDCMP|STRINGIDCMP|INTEGERIDCMP|IDCMP_CLOSEWINDOW|IDCMP_REFRESHWINDOW,
-				WA_Flags,	WFLG_DRAGBAR|WFLG_DEPTHGADGET|WFLG_CLOSEGADGET|WFLG_SMART_REFRESH|WFLG_ACTIVATE,
-				WA_Gadgets,	User_EditorGList,
-				WA_Title,	User_EditorWdt,
-				WA_ScreenTitle,	"DLG-Edit (Editing User)",
-				TAG_DONE )))
-	return( 4L );
+        GT_RefreshWindow( User_EditorWnd, NULL );
 
-	GT_RefreshWindow( User_EditorWnd, NULL );
+        User_EditorRender();
 
-	User_EditorRender();
-
-	return( 0L );
+        return( 0L );
 }
 
 void CloseUser_EditorWindow( void )
 {
-	if ( User_EditorWnd        ) {
-		CloseWindow( User_EditorWnd );
-		User_EditorWnd = NULL;
-	}
+        if ( User_EditorWnd        ) {
+                CloseWindow( User_EditorWnd );
+                User_EditorWnd = NULL;
+        }
 
-	if ( User_EditorGList      ) {
-		FreeGadgets( User_EditorGList );
-		User_EditorGList = NULL;
-	}
-
-	if ( User_EditorFont ) {
-		CloseFont( User_EditorFont );
-		User_EditorFont = NULL;
-	}
+        if ( User_EditorGList      ) {
+                FreeGadgets( User_EditorGList );
+                User_EditorGList = NULL;
+        }
 }
 
 void Main_Status_DisplayRender( void )
 {
-	struct IntuiText	it;
-	UWORD			cnt;
+        struct IntuiText        it;
+        UWORD                   cnt;
 
-	ComputeFont( Main_Status_DisplayWidth, Main_Status_DisplayHeight );
+        ComputeFont( Main_Status_DisplayWidth, Main_Status_DisplayHeight );
 
-	DrawBevelBox( Main_Status_DisplayWnd->RPort, OffX + ComputeX( 6 ),
-					OffY + ComputeY( 4 ),
-					ComputeX( 145 ),
-					ComputeY( 43 ),
-					GT_VisualInfo, VisualInfo, TAG_DONE );
-	DrawBevelBox( Main_Status_DisplayWnd->RPort, OffX + ComputeX( 4 ),
-					OffY + ComputeY( 3 ),
-					ComputeX( 149 ),
-					ComputeY( 45 ),
-					GT_VisualInfo, VisualInfo, GTBB_Recessed, TRUE, TAG_DONE );
+        DrawBevelBox( Main_Status_DisplayWnd->RPort, OffX + ComputeX( 4 ),
+                                        OffY + ComputeY( 6 ),
+                                        ComputeX( 193 ),
+                                        ComputeY( 41 ),
+                                        GT_VisualInfo, VisualInfo, GTBB_Recessed, TRUE, TAG_DONE );
 
-	for ( cnt = 0; cnt < Main_Status_Display_TNUM; cnt++ ) {
-		CopyMem(( char * )&Main_Status_DisplayIText[ cnt ], ( char * )&it, (long)sizeof( struct IntuiText ));
-		it.ITextFont = Font;
-		it.LeftEdge  = OffX + ComputeX( it.LeftEdge ) - ( IntuiTextLength( &it ) >> 1 );
-		it.TopEdge   = OffY + ComputeY( it.TopEdge ) - ( Font->ta_YSize >> 1 );
-		PrintIText( Main_Status_DisplayWnd->RPort, &it, 0, 0 );
-	}
+        for ( cnt = 0; cnt < Main_Status_Display_TNUM; cnt++ ) {
+                CopyMem(( char * )&Main_Status_DisplayIText[ cnt ], ( char * )&it, (long)sizeof( struct IntuiText ));
+                it.ITextFont = Font;
+                it.LeftEdge  = OffX + ComputeX( it.LeftEdge ) - ( IntuiTextLength( &it ) >> 1 );
+                it.TopEdge   = OffY + ComputeY( it.TopEdge ) - ( Font->ta_YSize >> 1 );
+                PrintIText( Main_Status_DisplayWnd->RPort, &it, 0, 0 );
+        }
 }
 
 int HandleMain_Status_DisplayIDCMP( void )
 {
-	struct IntuiMessage	*m;
-	struct MenuItem		*n;
-	int			(*func)();
-	BOOL			running = TRUE;
+        struct IntuiMessage     *m;
+        struct MenuItem         *n;
+        int                     (*func)();
+        BOOL                    running = TRUE;
 
-	while( m = GT_GetIMsg( Main_Status_DisplayWnd->UserPort )) {
+        while( m = GT_GetIMsg( Main_Status_DisplayWnd->UserPort )) {
 
-		CopyMem(( char * )m, ( char * )&Main_Status_DisplayMsg, (long)sizeof( struct IntuiMessage ));
+                CopyMem(( char * )m, ( char * )&Main_Status_DisplayMsg, (long)sizeof( struct IntuiMessage ));
 
-		GT_ReplyIMsg( m );
+                GT_ReplyIMsg( m );
 
-		switch ( Main_Status_DisplayMsg.Class ) {
+                switch ( Main_Status_DisplayMsg.Class ) {
 
-			case	IDCMP_REFRESHWINDOW:
-				GT_BeginRefresh( Main_Status_DisplayWnd );
-				Main_Status_DisplayRender();
-				GT_EndRefresh( Main_Status_DisplayWnd, TRUE );
-				break;
+                        case    IDCMP_REFRESHWINDOW:
+                                GT_BeginRefresh( Main_Status_DisplayWnd );
+                                Main_Status_DisplayRender();
+                                GT_EndRefresh( Main_Status_DisplayWnd, TRUE );
+                                break;
 
-			case	IDCMP_CLOSEWINDOW:
-				running = Main_Status_DisplayCloseWindow();
-				break;
+                        case    IDCMP_CLOSEWINDOW:
+                                running = Main_Status_DisplayCloseWindow();
+                                break;
 
-			case	IDCMP_GADGETUP:
-				func = ( void * )(( struct Gadget * )Main_Status_DisplayMsg.IAddress )->UserData;
-				running = func();
-				break;
+                        case    IDCMP_GADGETUP:
+                                func = ( void * )(( struct Gadget * )Main_Status_DisplayMsg.IAddress )->UserData;
+                                running = func();
+                                break;
 
-			case	IDCMP_MENUPICK:
-				while( Main_Status_DisplayMsg.Code != MENUNULL ) {
-					n = ItemAddress( Main_Status_DisplayMenus, Main_Status_DisplayMsg.Code );
-					func = (void *)(GTMENUITEM_USERDATA( n ));
-					running = func();
-					Main_Status_DisplayMsg.Code = n->NextSelect;
-				}
-				break;
-		}
-	}
-	return( running );
+                        case    IDCMP_MENUPICK:
+                                while( Main_Status_DisplayMsg.Code != MENUNULL ) {
+                                        n = ItemAddress( Main_Status_DisplayMenus, Main_Status_DisplayMsg.Code );
+                                        func = (void *)(GTMENUITEM_USERDATA( n ));
+                                        running = func();
+                                        Main_Status_DisplayMsg.Code = n->NextSelect;
+                                }
+                                break;
+                }
+        }
+        return( running );
 }
 
 int OpenMain_Status_DisplayWindow( void )
 {
-	struct NewGadget	ng;
-	struct Gadget	*g;
-	UWORD		lc, tc;
-	UWORD		wleft = Main_Status_DisplayLeft, wtop = Main_Status_DisplayTop, ww, wh;
+        struct NewGadget        ng;
+        struct Gadget   *g;
+        UWORD           lc, tc;
+        UWORD           wleft = Main_Status_DisplayLeft, wtop = Main_Status_DisplayTop, ww, wh;
 
-	ComputeFont( Main_Status_DisplayWidth, Main_Status_DisplayHeight );
+        ComputeFont( Main_Status_DisplayWidth, Main_Status_DisplayHeight );
 
-	ww = ComputeX( Main_Status_DisplayWidth );
-	wh = ComputeY( Main_Status_DisplayHeight );
+        ww = ComputeX( Main_Status_DisplayWidth );
+        wh = ComputeY( Main_Status_DisplayHeight );
 
-	if (( wleft + ww + OffX + Scr->WBorRight ) > Scr->Width ) wleft = Scr->Width - ww;
-	if (( wtop + wh + OffY + Scr->WBorBottom ) > Scr->Height ) wtop = Scr->Height - wh;
+        if (( wleft + ww + OffX + Scr->WBorRight ) > Scr->Width ) wleft = Scr->Width - ww;
+        if (( wtop + wh + OffY + Scr->WBorBottom ) > Scr->Height ) wtop = Scr->Height - wh;
 
-	if ( ! ( Main_Status_DisplayFont = OpenDiskFont( Font )))
-		return( 5L );
+        if ( ! ( g = CreateContext( &Main_Status_DisplayGList )))
+                return( 1L );
 
-	if ( ! ( g = CreateContext( &Main_Status_DisplayGList )))
-		return( 1L );
+        for( lc = 0, tc = 0; lc < Main_Status_Display_CNT; lc++ ) {
 
-	for( lc = 0, tc = 0; lc < Main_Status_Display_CNT; lc++ ) {
+                CopyMem((char * )&Main_Status_DisplayNGad[ lc ], (char * )&ng, (long)sizeof( struct NewGadget ));
 
-		CopyMem((char * )&Main_Status_DisplayNGad[ lc ], (char * )&ng, (long)sizeof( struct NewGadget ));
+                ng.ng_VisualInfo = VisualInfo;
+                ng.ng_TextAttr   = Font;
+                ng.ng_LeftEdge   = OffX + ComputeX( ng.ng_LeftEdge );
+                ng.ng_TopEdge    = OffY + ComputeY( ng.ng_TopEdge );
+                ng.ng_Width      = ComputeX( ng.ng_Width );
+                ng.ng_Height     = ComputeY( ng.ng_Height);
 
-		ng.ng_VisualInfo = VisualInfo;
-		ng.ng_TextAttr   = Font;
-		ng.ng_LeftEdge   = OffX + ComputeX( ng.ng_LeftEdge );
-		ng.ng_TopEdge    = OffY + ComputeY( ng.ng_TopEdge );
-		ng.ng_Width      = ComputeX( ng.ng_Width );
-		ng.ng_Height     = ComputeY( ng.ng_Height);
+                Main_Status_DisplayGadgets[ lc ] = g = CreateGadgetA((ULONG)Main_Status_DisplayGTypes[ lc ], g, &ng, ( struct TagItem * )&Main_Status_DisplayGTags[ tc ] );
 
-		Main_Status_DisplayGadgets[ lc ] = g = CreateGadgetA((ULONG)Main_Status_DisplayGTypes[ lc ], g, &ng, ( struct TagItem * )&Main_Status_DisplayGTags[ tc ] );
+                while( Main_Status_DisplayGTags[ tc ] ) tc += 2;
+                tc++;
 
-		while( Main_Status_DisplayGTags[ tc ] ) tc += 2;
-		tc++;
+                if ( NOT g )
+                        return( 2L );
+        }
 
-		if ( NOT g )
-			return( 2L );
-	}
+        if ( ! ( Main_Status_DisplayMenus = CreateMenus( Main_Status_DisplayNewMenu, GTMN_FrontPen, 0L, TAG_DONE )))
+                return( 3L );
 
-	if ( ! ( Main_Status_DisplayMenus = CreateMenus( Main_Status_DisplayNewMenu, GTMN_FrontPen, 0L, TAG_DONE )))
-		return( 3L );
+        LayoutMenus( Main_Status_DisplayMenus, VisualInfo, TAG_DONE );
 
-	LayoutMenus( Main_Status_DisplayMenus, VisualInfo, TAG_DONE );
+        if ( ! ( Main_Status_DisplayWnd = OpenWindowTags( NULL,
+                                WA_Left,        wleft,
+                                WA_Top,         wtop,
+                                WA_Width,       ww + OffX + Scr->WBorRight,
+                                WA_Height,      wh + OffY + Scr->WBorBottom,
+                                WA_IDCMP,       BUTTONIDCMP|IDCMP_MENUPICK|IDCMP_CLOSEWINDOW|IDCMP_REFRESHWINDOW,
+                                WA_Flags,       WFLG_DRAGBAR|WFLG_DEPTHGADGET|WFLG_CLOSEGADGET|WFLG_SMART_REFRESH|WFLG_ACTIVATE,
+                                WA_Gadgets,     Main_Status_DisplayGList,
+                                WA_Title,       Main_Status_DisplayWdt,
+                                WA_ScreenTitle, "DLG-Edit (Status Display)",
+                                WA_PubScreen,   Scr,
+                                TAG_DONE )))
+        return( 4L );
 
-	if ( ! ( Main_Status_DisplayWnd = OpenWindowTags( NULL,
-				WA_Left,	wleft,
-				WA_Top,		wtop,
-				WA_Width,	ww + OffX + Scr->WBorRight,
-				WA_Height,	wh + OffY + Scr->WBorBottom,
-				WA_IDCMP,	BUTTONIDCMP|IDCMP_MENUPICK|IDCMP_CLOSEWINDOW|IDCMP_REFRESHWINDOW,
-				WA_Flags,	WFLG_DRAGBAR|WFLG_DEPTHGADGET|WFLG_CLOSEGADGET|WFLG_SMART_REFRESH|WFLG_ACTIVATE,
-				WA_Gadgets,	Main_Status_DisplayGList,
-				WA_Title,	Main_Status_DisplayWdt,
-				WA_ScreenTitle,	"DLG-Edit (Status Display)",
-				TAG_DONE )))
-	return( 4L );
+        SetMenuStrip( Main_Status_DisplayWnd, Main_Status_DisplayMenus );
+        GT_RefreshWindow( Main_Status_DisplayWnd, NULL );
 
-	SetMenuStrip( Main_Status_DisplayWnd, Main_Status_DisplayMenus );
-	GT_RefreshWindow( Main_Status_DisplayWnd, NULL );
+        Main_Status_DisplayRender();
 
-	Main_Status_DisplayRender();
-
-	return( 0L );
+        return( 0L );
 }
 
 void CloseMain_Status_DisplayWindow( void )
 {
-	if ( Main_Status_DisplayMenus      ) {
-		ClearMenuStrip( Main_Status_DisplayWnd );
-		FreeMenus( Main_Status_DisplayMenus );
-		Main_Status_DisplayMenus = NULL;	}
+        if ( Main_Status_DisplayMenus      ) {
+                ClearMenuStrip( Main_Status_DisplayWnd );
+                FreeMenus( Main_Status_DisplayMenus );
+                Main_Status_DisplayMenus = NULL;        }
 
-	if ( Main_Status_DisplayWnd        ) {
-		CloseWindow( Main_Status_DisplayWnd );
-		Main_Status_DisplayWnd = NULL;
-	}
+        if ( Main_Status_DisplayWnd        ) {
+                CloseWindow( Main_Status_DisplayWnd );
+                Main_Status_DisplayWnd = NULL;
+        }
 
-	if ( Main_Status_DisplayGList      ) {
-		FreeGadgets( Main_Status_DisplayGList );
-		Main_Status_DisplayGList = NULL;
-	}
-
-	if ( Main_Status_DisplayFont ) {
-		CloseFont( Main_Status_DisplayFont );
-		Main_Status_DisplayFont = NULL;
-	}
+        if ( Main_Status_DisplayGList      ) {
+                FreeGadgets( Main_Status_DisplayGList );
+                Main_Status_DisplayGList = NULL;
+        }
 }
 
 void FileAreaTemplateRender( void )
 {
-	struct IntuiText	it;
-	UWORD			cnt;
+        ComputeFont( FileAreaTemplateWidth, FileAreaTemplateHeight );
 
-	ComputeFont( FileAreaTemplateWidth, FileAreaTemplateHeight );
-
-	DrawBevelBox( FileAreaTemplateWnd->RPort, OffX + ComputeX( 4 ),
-					OffY + ComputeY( 214 ),
-					ComputeX( 601 ),
-					ComputeY( 30 ),
-					GT_VisualInfo, VisualInfo, GTBB_Recessed, TRUE, TAG_DONE );
-	DrawBevelBox( FileAreaTemplateWnd->RPort, OffX + ComputeX( 4 ),
-					OffY + ComputeY( 2 ),
-					ComputeX( 601 ),
-					ComputeY( 212 ),
-					GT_VisualInfo, VisualInfo, GTBB_Recessed, TRUE, TAG_DONE );
-
-	for ( cnt = 0; cnt < FileAreaTemplate_TNUM; cnt++ ) {
-		CopyMem(( char * )&FileAreaTemplateIText[ cnt ], ( char * )&it, (long)sizeof( struct IntuiText ));
-		it.ITextFont = Font;
-		it.LeftEdge  = OffX + ComputeX( it.LeftEdge ) - ( IntuiTextLength( &it ) >> 1 );
-		it.TopEdge   = OffY + ComputeY( it.TopEdge ) - ( Font->ta_YSize >> 1 );
-		PrintIText( FileAreaTemplateWnd->RPort, &it, 0, 0 );
-	}
+        DrawBevelBox( FileAreaTemplateWnd->RPort, OffX + ComputeX( 4 ),
+                                        OffY + ComputeY( 226 ),
+                                        ComputeX( 617 ),
+                                        ComputeY( 66 ),
+                                        GT_VisualInfo, VisualInfo, GTBB_Recessed, TRUE, TAG_DONE );
+        DrawBevelBox( FileAreaTemplateWnd->RPort, OffX + ComputeX( 4 ),
+                                        OffY + ComputeY( 2 ),
+                                        ComputeX( 617 ),
+                                        ComputeY( 221 ),
+                                        GT_VisualInfo, VisualInfo, GTBB_Recessed, TRUE, TAG_DONE );
 }
 
 int HandleFileAreaTemplateIDCMP( void )
 {
-	struct IntuiMessage	*m;
-	int			(*func)();
-	BOOL			running = TRUE;
+        struct IntuiMessage     *m;
+        int                     (*func)();
+        BOOL                    running = TRUE;
 
-	while( m = GT_GetIMsg( FileAreaTemplateWnd->UserPort )) {
+        while( m = GT_GetIMsg( FileAreaTemplateWnd->UserPort )) {
 
-		CopyMem(( char * )m, ( char * )&FileAreaTemplateMsg, (long)sizeof( struct IntuiMessage ));
+                CopyMem(( char * )m, ( char * )&FileAreaTemplateMsg, (long)sizeof( struct IntuiMessage ));
 
-		GT_ReplyIMsg( m );
+                GT_ReplyIMsg( m );
 
-		switch ( FileAreaTemplateMsg.Class ) {
+                switch ( FileAreaTemplateMsg.Class ) {
 
-			case	IDCMP_REFRESHWINDOW:
-				GT_BeginRefresh( FileAreaTemplateWnd );
-				FileAreaTemplateRender();
-				GT_EndRefresh( FileAreaTemplateWnd, TRUE );
-				break;
+                        case    IDCMP_REFRESHWINDOW:
+                                GT_BeginRefresh( FileAreaTemplateWnd );
+                                FileAreaTemplateRender();
+                                GT_EndRefresh( FileAreaTemplateWnd, TRUE );
+                                break;
 
-			case	IDCMP_CLOSEWINDOW:
-				running = FileAreaTemplateCloseWindow();
-				break;
+                        case    IDCMP_CLOSEWINDOW:
+                                running = FileAreaTemplateCloseWindow();
+                                break;
 
-			case	IDCMP_GADGETUP:
-			case	IDCMP_GADGETDOWN:
-				func = ( void * )(( struct Gadget * )FileAreaTemplateMsg.IAddress )->UserData;
-				running = func();
-				break;
-		}
-	}
-	return( running );
+                        case    IDCMP_GADGETUP:
+                        case    IDCMP_GADGETDOWN:
+                                func = ( void * )(( struct Gadget * )FileAreaTemplateMsg.IAddress )->UserData;
+                                running = func();
+                                break;
+                }
+        }
+        return( running );
 }
 
 int OpenFileAreaTemplateWindow( void )
 {
-	struct NewGadget	ng;
-	struct Gadget	*g;
-	UWORD		lc, tc;
-	UWORD		wleft = FileAreaTemplateLeft, wtop = FileAreaTemplateTop, ww, wh;
+        struct NewGadget        ng;
+        struct Gadget   *g;
+        UWORD           lc, tc;
+        UWORD           wleft = FileAreaTemplateLeft, wtop = FileAreaTemplateTop, ww, wh;
 
-	ComputeFont( FileAreaTemplateWidth, FileAreaTemplateHeight );
+        ComputeFont( FileAreaTemplateWidth, FileAreaTemplateHeight );
 
-	ww = ComputeX( FileAreaTemplateWidth );
-	wh = ComputeY( FileAreaTemplateHeight );
+        ww = ComputeX( FileAreaTemplateWidth );
+        wh = ComputeY( FileAreaTemplateHeight );
 
-	if (( wleft + ww + OffX + Scr->WBorRight ) > Scr->Width ) wleft = Scr->Width - ww;
-	if (( wtop + wh + OffY + Scr->WBorBottom ) > Scr->Height ) wtop = Scr->Height - wh;
+        if (( wleft + ww + OffX + Scr->WBorRight ) > Scr->Width ) wleft = Scr->Width - ww;
+        if (( wtop + wh + OffY + Scr->WBorBottom ) > Scr->Height ) wtop = Scr->Height - wh;
 
-	if ( ! ( FileAreaTemplateFont = OpenDiskFont( Font )))
-		return( 5L );
+        if ( ! ( g = CreateContext( &FileAreaTemplateGList )))
+                return( 1L );
 
-	if ( ! ( g = CreateContext( &FileAreaTemplateGList )))
-		return( 1L );
+        for( lc = 0, tc = 0; lc < FileAreaTemplate_CNT; lc++ ) {
 
-	for( lc = 0, tc = 0; lc < FileAreaTemplate_CNT; lc++ ) {
+                CopyMem((char * )&FileAreaTemplateNGad[ lc ], (char * )&ng, (long)sizeof( struct NewGadget ));
 
-		CopyMem((char * )&FileAreaTemplateNGad[ lc ], (char * )&ng, (long)sizeof( struct NewGadget ));
+                ng.ng_VisualInfo = VisualInfo;
+                ng.ng_TextAttr   = Font;
+                ng.ng_LeftEdge   = OffX + ComputeX( ng.ng_LeftEdge );
+                ng.ng_TopEdge    = OffY + ComputeY( ng.ng_TopEdge );
+                ng.ng_Width      = ComputeX( ng.ng_Width );
+                ng.ng_Height     = ComputeY( ng.ng_Height);
 
-		ng.ng_VisualInfo = VisualInfo;
-		ng.ng_TextAttr   = Font;
-		ng.ng_LeftEdge   = OffX + ComputeX( ng.ng_LeftEdge );
-		ng.ng_TopEdge    = OffY + ComputeY( ng.ng_TopEdge );
-		ng.ng_Width      = ComputeX( ng.ng_Width );
-		ng.ng_Height     = ComputeY( ng.ng_Height);
+                FileAreaTemplateGadgets[ lc ] = g = CreateGadgetA((ULONG)FileAreaTemplateGTypes[ lc ], g, &ng, ( struct TagItem * )&FileAreaTemplateGTags[ tc ] );
 
-		FileAreaTemplateGadgets[ lc ] = g = CreateGadgetA((ULONG)FileAreaTemplateGTypes[ lc ], g, &ng, ( struct TagItem * )&FileAreaTemplateGTags[ tc ] );
+                while( FileAreaTemplateGTags[ tc ] ) tc += 2;
+                tc++;
 
-		while( FileAreaTemplateGTags[ tc ] ) tc += 2;
-		tc++;
+                if ( NOT g )
+                        return( 2L );
+        }
 
-		if ( NOT g )
-			return( 2L );
-	}
+        if ( ! ( FileAreaTemplateWnd = OpenWindowTags( NULL,
+                                WA_Left,        wleft,
+                                WA_Top,         wtop,
+                                WA_Width,       ww + OffX + Scr->WBorRight,
+                                WA_Height,      wh + OffY + Scr->WBorBottom,
+                                WA_IDCMP,       LISTVIEWIDCMP|BUTTONIDCMP|CHECKBOXIDCMP|IDCMP_CLOSEWINDOW|IDCMP_REFRESHWINDOW,
+                                WA_Flags,       WFLG_DRAGBAR|WFLG_DEPTHGADGET|WFLG_CLOSEGADGET|WFLG_SMART_REFRESH|WFLG_ACTIVATE,
+                                WA_Gadgets,     FileAreaTemplateGList,
+                                WA_Title,       FileAreaTemplateWdt,
+                                WA_PubScreen,   Scr,
+                                WA_AutoAdjust,  TRUE,
+                                TAG_DONE )))
+        return( 4L );
 
-	if ( ! ( FileAreaTemplateWnd = OpenWindowTags( NULL,
-				WA_Left,	wleft,
-				WA_Top,		wtop,
-				WA_Width,	ww + OffX + Scr->WBorRight,
-				WA_Height,	wh + OffY + Scr->WBorBottom,
-				WA_IDCMP,	LISTVIEWIDCMP|BUTTONIDCMP|CHECKBOXIDCMP|IDCMP_CLOSEWINDOW|IDCMP_REFRESHWINDOW,
-				WA_Flags,	WFLG_DRAGBAR|WFLG_DEPTHGADGET|WFLG_CLOSEGADGET|WFLG_SMART_REFRESH,
-				WA_Gadgets,	FileAreaTemplateGList,
-				WA_Title,	FileAreaTemplateWdt,
-				WA_ScreenTitle,	"GadToolsBox V2.0b © 1991-1993",
-				TAG_DONE )))
-	return( 4L );
+        GT_RefreshWindow( FileAreaTemplateWnd, NULL );
 
-	GT_RefreshWindow( FileAreaTemplateWnd, NULL );
+        FileAreaTemplateRender();
 
-	FileAreaTemplateRender();
-
-	return( 0L );
+        return( 0L );
 }
 
 void CloseFileAreaTemplateWindow( void )
 {
-	if ( FileAreaTemplateWnd        ) {
-		CloseWindow( FileAreaTemplateWnd );
-		FileAreaTemplateWnd = NULL;
-	}
+        if ( FileAreaTemplateWnd        ) {
+                CloseWindow( FileAreaTemplateWnd );
+                FileAreaTemplateWnd = NULL;
+        }
 
-	if ( FileAreaTemplateGList      ) {
-		FreeGadgets( FileAreaTemplateGList );
-		FileAreaTemplateGList = NULL;
-	}
-
-	if ( FileAreaTemplateFont ) {
-		CloseFont( FileAreaTemplateFont );
-		FileAreaTemplateFont = NULL;
-	}
+        if ( FileAreaTemplateGList      ) {
+                FreeGadgets( FileAreaTemplateGList );
+                FileAreaTemplateGList = NULL;
+        }
 }
 
 void MsgAreaTemplateRender( void )
 {
-	struct IntuiText	it;
-	UWORD			cnt;
+        ComputeFont( MsgAreaTemplateWidth, MsgAreaTemplateHeight );
 
-	ComputeFont( MsgAreaTemplateWidth, MsgAreaTemplateHeight );
-
-	DrawBevelBox( MsgAreaTemplateWnd->RPort, OffX + ComputeX( 4 ),
-					OffY + ComputeY( 214 ),
-					ComputeX( 601 ),
-					ComputeY( 30 ),
-					GT_VisualInfo, VisualInfo, GTBB_Recessed, TRUE, TAG_DONE );
-	DrawBevelBox( MsgAreaTemplateWnd->RPort, OffX + ComputeX( 4 ),
-					OffY + ComputeY( 2 ),
-					ComputeX( 601 ),
-					ComputeY( 212 ),
-					GT_VisualInfo, VisualInfo, GTBB_Recessed, TRUE, TAG_DONE );
-
-	for ( cnt = 0; cnt < MsgAreaTemplate_TNUM; cnt++ ) {
-		CopyMem(( char * )&MsgAreaTemplateIText[ cnt ], ( char * )&it, (long)sizeof( struct IntuiText ));
-		it.ITextFont = Font;
-		it.LeftEdge  = OffX + ComputeX( it.LeftEdge ) - ( IntuiTextLength( &it ) >> 1 );
-		it.TopEdge   = OffY + ComputeY( it.TopEdge ) - ( Font->ta_YSize >> 1 );
-		PrintIText( MsgAreaTemplateWnd->RPort, &it, 0, 0 );
-	}
+        DrawBevelBox( MsgAreaTemplateWnd->RPort, OffX + ComputeX( 4 ),
+                                        OffY + ComputeY( 226 ),
+                                        ComputeX( 617 ),
+                                        ComputeY( 81 ),
+                                        GT_VisualInfo, VisualInfo, GTBB_Recessed, TRUE, TAG_DONE );
+        DrawBevelBox( MsgAreaTemplateWnd->RPort, OffX + ComputeX( 4 ),
+                                        OffY + ComputeY( 2 ),
+                                        ComputeX( 617 ),
+                                        ComputeY( 221 ),
+                                        GT_VisualInfo, VisualInfo, GTBB_Recessed, TRUE, TAG_DONE );
 }
 
 int HandleMsgAreaTemplateIDCMP( void )
 {
-	struct IntuiMessage	*m;
-	int			(*func)();
-	BOOL			running = TRUE;
+        struct IntuiMessage     *m;
+        int                     (*func)();
+        BOOL                    running = TRUE;
 
-	while( m = GT_GetIMsg( MsgAreaTemplateWnd->UserPort )) {
+        while( m = GT_GetIMsg( MsgAreaTemplateWnd->UserPort )) {
 
-		CopyMem(( char * )m, ( char * )&MsgAreaTemplateMsg, (long)sizeof( struct IntuiMessage ));
+                CopyMem(( char * )m, ( char * )&MsgAreaTemplateMsg, (long)sizeof( struct IntuiMessage ));
 
-		GT_ReplyIMsg( m );
+                GT_ReplyIMsg( m );
 
-		switch ( MsgAreaTemplateMsg.Class ) {
+                switch ( MsgAreaTemplateMsg.Class ) {
 
-			case	IDCMP_REFRESHWINDOW:
-				GT_BeginRefresh( MsgAreaTemplateWnd );
-				MsgAreaTemplateRender();
-				GT_EndRefresh( MsgAreaTemplateWnd, TRUE );
-				break;
+                        case    IDCMP_REFRESHWINDOW:
+                                GT_BeginRefresh( MsgAreaTemplateWnd );
+                                MsgAreaTemplateRender();
+                                GT_EndRefresh( MsgAreaTemplateWnd, TRUE );
+                                break;
 
-			case	IDCMP_CLOSEWINDOW:
-				running = MsgAreaTemplateCloseWindow();
-				break;
+                        case    IDCMP_CLOSEWINDOW:
+                                running = MsgAreaTemplateCloseWindow();
+                                break;
 
-			case	IDCMP_GADGETUP:
-			case	IDCMP_GADGETDOWN:
-				func = ( void * )(( struct Gadget * )MsgAreaTemplateMsg.IAddress )->UserData;
-				running = func();
-				break;
-		}
-	}
-	return( running );
+                        case    IDCMP_GADGETUP:
+                        case    IDCMP_GADGETDOWN:
+                                func = ( void * )(( struct Gadget * )MsgAreaTemplateMsg.IAddress )->UserData;
+                                running = func();
+                                break;
+                }
+        }
+        return( running );
 }
 
 int OpenMsgAreaTemplateWindow( void )
 {
-	struct NewGadget	ng;
-	struct Gadget	*g;
-	UWORD		lc, tc;
-	UWORD		wleft = MsgAreaTemplateLeft, wtop = MsgAreaTemplateTop, ww, wh;
+        struct NewGadget        ng;
+        struct Gadget   *g;
+        UWORD           lc, tc;
+        UWORD           wleft = MsgAreaTemplateLeft, wtop = MsgAreaTemplateTop, ww, wh;
 
-	ComputeFont( MsgAreaTemplateWidth, MsgAreaTemplateHeight );
+        ComputeFont( MsgAreaTemplateWidth, MsgAreaTemplateHeight );
 
-	ww = ComputeX( MsgAreaTemplateWidth );
-	wh = ComputeY( MsgAreaTemplateHeight );
+        ww = ComputeX( MsgAreaTemplateWidth );
+        wh = ComputeY( MsgAreaTemplateHeight );
 
-	if (( wleft + ww + OffX + Scr->WBorRight ) > Scr->Width ) wleft = Scr->Width - ww;
-	if (( wtop + wh + OffY + Scr->WBorBottom ) > Scr->Height ) wtop = Scr->Height - wh;
+        if (( wleft + ww + OffX + Scr->WBorRight ) > Scr->Width ) wleft = Scr->Width - ww;
+        if (( wtop + wh + OffY + Scr->WBorBottom ) > Scr->Height ) wtop = Scr->Height - wh;
 
-	if ( ! ( MsgAreaTemplateFont = OpenDiskFont( Font )))
-		return( 5L );
+        if ( ! ( g = CreateContext( &MsgAreaTemplateGList )))
+                return( 1L );
 
-	if ( ! ( g = CreateContext( &MsgAreaTemplateGList )))
-		return( 1L );
+        for( lc = 0, tc = 0; lc < MsgAreaTemplate_CNT; lc++ ) {
 
-	for( lc = 0, tc = 0; lc < MsgAreaTemplate_CNT; lc++ ) {
+                CopyMem((char * )&MsgAreaTemplateNGad[ lc ], (char * )&ng, (long)sizeof( struct NewGadget ));
 
-		CopyMem((char * )&MsgAreaTemplateNGad[ lc ], (char * )&ng, (long)sizeof( struct NewGadget ));
+                ng.ng_VisualInfo = VisualInfo;
+                ng.ng_TextAttr   = Font;
+                ng.ng_LeftEdge   = OffX + ComputeX( ng.ng_LeftEdge );
+                ng.ng_TopEdge    = OffY + ComputeY( ng.ng_TopEdge );
+                ng.ng_Width      = ComputeX( ng.ng_Width );
+                ng.ng_Height     = ComputeY( ng.ng_Height);
 
-		ng.ng_VisualInfo = VisualInfo;
-		ng.ng_TextAttr   = Font;
-		ng.ng_LeftEdge   = OffX + ComputeX( ng.ng_LeftEdge );
-		ng.ng_TopEdge    = OffY + ComputeY( ng.ng_TopEdge );
-		ng.ng_Width      = ComputeX( ng.ng_Width );
-		ng.ng_Height     = ComputeY( ng.ng_Height);
+                MsgAreaTemplateGadgets[ lc ] = g = CreateGadgetA((ULONG)MsgAreaTemplateGTypes[ lc ], g, &ng, ( struct TagItem * )&MsgAreaTemplateGTags[ tc ] );
 
-		MsgAreaTemplateGadgets[ lc ] = g = CreateGadgetA((ULONG)MsgAreaTemplateGTypes[ lc ], g, &ng, ( struct TagItem * )&MsgAreaTemplateGTags[ tc ] );
+                while( MsgAreaTemplateGTags[ tc ] ) tc += 2;
+                tc++;
 
-		while( MsgAreaTemplateGTags[ tc ] ) tc += 2;
-		tc++;
+                if ( NOT g )
+                        return( 2L );
+        }
 
-		if ( NOT g )
-			return( 2L );
-	}
+        if ( ! ( MsgAreaTemplateWnd = OpenWindowTags( NULL,
+                                WA_Left,        wleft,
+                                WA_Top,         wtop,
+                                WA_Width,       ww + OffX + Scr->WBorRight,
+                                WA_Height,      wh + OffY + Scr->WBorBottom,
+                                WA_IDCMP,       LISTVIEWIDCMP|BUTTONIDCMP|CHECKBOXIDCMP|IDCMP_CLOSEWINDOW|IDCMP_REFRESHWINDOW,
+                                WA_Flags,       WFLG_DRAGBAR|WFLG_DEPTHGADGET|WFLG_CLOSEGADGET|WFLG_SMART_REFRESH|WFLG_ACTIVATE,
+                                WA_Gadgets,     MsgAreaTemplateGList,
+                                WA_Title,       MsgAreaTemplateWdt,
+                                WA_PubScreen,   Scr,
+                                WA_AutoAdjust,  TRUE,
+                                TAG_DONE )))
+        return( 4L );
 
-	if ( ! ( MsgAreaTemplateWnd = OpenWindowTags( NULL,
-				WA_Left,	wleft,
-				WA_Top,		wtop,
-				WA_Width,	ww + OffX + Scr->WBorRight,
-				WA_Height,	wh + OffY + Scr->WBorBottom,
-				WA_IDCMP,	LISTVIEWIDCMP|BUTTONIDCMP|CHECKBOXIDCMP|IDCMP_CLOSEWINDOW|IDCMP_REFRESHWINDOW,
-				WA_Flags,	WFLG_DRAGBAR|WFLG_DEPTHGADGET|WFLG_CLOSEGADGET|WFLG_SMART_REFRESH,
-				WA_Gadgets,	MsgAreaTemplateGList,
-				WA_Title,	MsgAreaTemplateWdt,
-				WA_ScreenTitle,	"GadToolsBox V2.0b © 1991-1993",
-				TAG_DONE )))
-	return( 4L );
+        GT_RefreshWindow( MsgAreaTemplateWnd, NULL );
 
-	GT_RefreshWindow( MsgAreaTemplateWnd, NULL );
+        MsgAreaTemplateRender();
 
-	MsgAreaTemplateRender();
-
-	return( 0L );
+        return( 0L );
 }
 
 void CloseMsgAreaTemplateWindow( void )
 {
-	if ( MsgAreaTemplateWnd        ) {
-		CloseWindow( MsgAreaTemplateWnd );
-		MsgAreaTemplateWnd = NULL;
-	}
+        if ( MsgAreaTemplateWnd        ) {
+                CloseWindow( MsgAreaTemplateWnd );
+                MsgAreaTemplateWnd = NULL;
+        }
 
-	if ( MsgAreaTemplateGList      ) {
-		FreeGadgets( MsgAreaTemplateGList );
-		MsgAreaTemplateGList = NULL;
-	}
+        if ( MsgAreaTemplateGList      ) {
+                FreeGadgets( MsgAreaTemplateGList );
+                MsgAreaTemplateGList = NULL;
+        }
+}
 
-	if ( MsgAreaTemplateFont ) {
-		CloseFont( MsgAreaTemplateFont );
-		MsgAreaTemplateFont = NULL;
-	}
+void FileUserAccessRender( void )
+{
+        ComputeFont( FileUserAccessWidth, FileUserAccessHeight );
+
+        DrawBevelBox( FileUserAccessWnd->RPort, OffX + ComputeX( 4 ),
+                                        OffY + ComputeY( 351 ),
+                                        ComputeX( 585 ),
+                                        ComputeY( 46 ),
+                                        GT_VisualInfo, VisualInfo, TAG_DONE );
+        DrawBevelBox( FileUserAccessWnd->RPort, OffX + ComputeX( 4 ),
+                                        OffY + ComputeY( 2 ),
+                                        ComputeX( 585 ),
+                                        ComputeY( 171 ),
+                                        GT_VisualInfo, VisualInfo, GTBB_Recessed, TRUE, TAG_DONE );
+        DrawBevelBox( FileUserAccessWnd->RPort, OffX + ComputeX( 4 ),
+                                        OffY + ComputeY( 176 ),
+                                        ComputeX( 585 ),
+                                        ComputeY( 171 ),
+                                        GT_VisualInfo, VisualInfo, GTBB_Recessed, TRUE, TAG_DONE );
+}
+
+int HandleFileUserAccessIDCMP( void )
+{
+        struct IntuiMessage     *m;
+        int                     (*func)();
+        BOOL                    running = TRUE;
+
+        while( m = GT_GetIMsg( FileUserAccessWnd->UserPort )) {
+
+                CopyMem(( char * )m, ( char * )&FileUserAccessMsg, (long)sizeof( struct IntuiMessage ));
+
+                GT_ReplyIMsg( m );
+
+                switch ( FileUserAccessMsg.Class ) {
+
+                        case    IDCMP_REFRESHWINDOW:
+                                GT_BeginRefresh( FileUserAccessWnd );
+                                FileUserAccessRender();
+                                GT_EndRefresh( FileUserAccessWnd, TRUE );
+                                break;
+
+                        case    IDCMP_CLOSEWINDOW:
+                                running = FileUserAccessCloseWindow();
+                                break;
+
+                        case    IDCMP_GADGETUP:
+                        case    IDCMP_GADGETDOWN:
+                                func = ( void * )(( struct Gadget * )FileUserAccessMsg.IAddress )->UserData;
+                                running = func();
+                                break;
+                }
+        }
+        return( running );
+}
+
+int OpenFileUserAccessWindow( void )
+{
+        struct NewGadget        ng;
+        struct Gadget   *g;
+        UWORD           lc, tc;
+        UWORD           wleft = FileUserAccessLeft, wtop = FileUserAccessTop, ww, wh;
+
+        ComputeFont( FileUserAccessWidth, FileUserAccessHeight );
+
+        ww = ComputeX( FileUserAccessWidth );
+        wh = ComputeY( FileUserAccessHeight );
+
+        if (( wleft + ww + OffX + Scr->WBorRight ) > Scr->Width ) wleft = Scr->Width - ww;
+        if (( wtop + wh + OffY + Scr->WBorBottom ) > Scr->Height ) wtop = Scr->Height - wh;
+
+        if ( ! ( g = CreateContext( &FileUserAccessGList )))
+                return( 1L );
+
+        for( lc = 0, tc = 0; lc < FileUserAccess_CNT; lc++ ) {
+
+                CopyMem((char * )&FileUserAccessNGad[ lc ], (char * )&ng, (long)sizeof( struct NewGadget ));
+
+                ng.ng_VisualInfo = VisualInfo;
+                ng.ng_TextAttr   = Font;
+                ng.ng_LeftEdge   = OffX + ComputeX( ng.ng_LeftEdge );
+                ng.ng_TopEdge    = OffY + ComputeY( ng.ng_TopEdge );
+                ng.ng_Width      = ComputeX( ng.ng_Width );
+                ng.ng_Height     = ComputeY( ng.ng_Height);
+
+                FileUserAccessGadgets[ lc ] = g = CreateGadgetA((ULONG)FileUserAccessGTypes[ lc ], g, &ng, ( struct TagItem * )&FileUserAccessGTags[ tc ] );
+
+                while( FileUserAccessGTags[ tc ] ) tc += 2;
+                tc++;
+
+                if ( NOT g )
+                        return( 2L );
+        }
+
+        if ( ! ( FileUserAccessWnd = OpenWindowTags( NULL,
+                                WA_Left,        wleft,
+                                WA_Top,         wtop,
+                                WA_Width,       ww + OffX + Scr->WBorRight,
+                                WA_Height,      wh + OffY + Scr->WBorBottom,
+                                WA_IDCMP,       LISTVIEWIDCMP|BUTTONIDCMP|TEXTIDCMP|MXIDCMP|IDCMP_CLOSEWINDOW|IDCMP_REFRESHWINDOW,
+                                WA_Flags,       WFLG_DRAGBAR|WFLG_DEPTHGADGET|WFLG_CLOSEGADGET|WFLG_SIZEBBOTTOM|WFLG_SMART_REFRESH,
+                                WA_Gadgets,     FileUserAccessGList,
+                                WA_Title,       FileUserAccessWdt,
+                                WA_PubScreen,   Scr,
+                                WA_AutoAdjust,  TRUE,
+                                TAG_DONE )))
+        return( 4L );
+
+        GT_RefreshWindow( FileUserAccessWnd, NULL );
+
+        FileUserAccessRender();
+
+        return( 0L );
+}
+
+void CloseFileUserAccessWindow( void )
+{
+        if ( FileUserAccessWnd        ) {
+                CloseWindow( FileUserAccessWnd );
+                FileUserAccessWnd = NULL;
+        }
+
+        if ( FileUserAccessGList      ) {
+                FreeGadgets( FileUserAccessGList );
+                FileUserAccessGList = NULL;
+        }
 }
 

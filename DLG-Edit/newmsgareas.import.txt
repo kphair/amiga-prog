@@ -1,0 +1,15 @@
+3000
+UseNet news: Amiga Emulations
+comp.sys.amiga.emulations
+
+0
+UseNet news: Amiga Programmers
+comp.sys.amiga.programmer
+
+0
+UseNet news: Sinclair computers
+comp.sys.sinclair
+
+5000
+UseNet news: Babylon 5
+rec.arts.sf.tv.babylon5

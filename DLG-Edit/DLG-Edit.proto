@@ -1,0 +1,23 @@
+extern ULONG AccessLevelIndex(int);
+extern void AllocatePointerMem(void);
+extern void FreePointerMem(void);
+extern void CopyAccessLists(void);
+extern void CopyFileAreaList(void);
+extern void CopyMsgAreaList(void);
+extern void DisableWindows(SHORT);
+extern void EnableWindows(SHORT);
+extern void GetBBSUsers(void);
+extern void GetDLGArchiverTypes(void);
+extern void GetDLGCharacterSetTypes(void);
+extern void GetDLGEditorTypes(void);
+extern void GetDLGMenuSetTypes(void);
+extern void GetDLGTerminalTypes(void);
+extern void GetDLGTransferProtocols(void);
+extern void GetFileAreaList(void);
+extern void GetMsgAreaList(void);
+extern void InitActionFiles(void);
+extern void FileActionQ(int, SHORT, SHORT);
+extern void MsgActionQ(int, SHORT, SHORT);
+extern void SaveFileAreaList(void);
+extern void SaveMsgAreaList(void);
+

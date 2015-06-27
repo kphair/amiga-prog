@@ -26,13 +26,22 @@ int FileAreaDown_buttonClicked (void);
 int FileAreaSave_buttonClicked (void);
 int FileValidationArea_integerClicked (void);
 int File_Area_ManagerRawKey(void);
-int FileApplyTemplate_buttonClicked (void);
-int FileTemplateSrc_listviewClicked (void);
-int FileTemplateDest_listviewClicked (void);
 int FileImportAreas_buttonClicked (void);
+int FileApplyTemplate_buttonClicked (void);
+
+int FileTemplateSrc_listviewClicked (void);
+int FileTemplateTarg_listviewClicked (void);
 int FileTemplateApply_buttonClicked (void);
 int FileTemplateCancel_buttonClicked (void);
-int FileTemplateConfirmApply_checkClicked (void);
+int FileTemplateConfirm_checkClicked (void);
+int FileTempUpload_checkClicked (void);
+int FileTempSysop_checkClicked (void);
+int FileTempUsers_checkClicked (void);
+int FileTempDownload_checkClicked (void);
+int FileTempTransfer_checkClicked (void);
+int FileTempPath_checkClicked (void);
+int FileTempKill_checkClicked (void);
+int FileTempAccess_checkClicked (void);
 int FileAreaTemplateCloseWindow (void);
 
 int MsgArea_listviewClicked (void);
@@ -74,13 +83,22 @@ int MsgAreaDown_buttonClicked (void);
 int MsgAreaNumber_integerClicked (void);
 int MsgAreaSave_buttonClicked (void);
 int Message_Area_ManagerRawKey(void);
-int MsgApplyTemplate_buttonClicked (void);
-int MsgTemplateSrc_listviewClicked (void);
-int MsgTemplateDest_listviewClicked (void);
 int MsgImportAreas_buttonClicked (void);
+int MsgApplyTemplate_buttonClicked (void);
+
+int MsgTemplateSrc_listviewClicked (void);
+int MsgTemplateTarg_listviewClicked (void);
 int MsgTemplateApply_buttonClicked (void);
 int MsgTemplateCancel_buttonClicked (void);
-int MsgTemplateConfirmApply_checkClicked (void);
+int MsgTemplateConfirm_checkClicked (void);
+int MsgTempReEdit_checkClicked (void);
+int MsgTempKill_checkClicked (void);
+int MsgTempSysop_checkClicked (void);
+int MsgTempCopy_checkClicked (void);
+int MsgTempUsers_checkClicked (void);
+int MsgTempWrite_checkClicked (void);
+int MsgTempAccess_checkClicked (void);
+int MsgTempForward_checkClicked (void);
 int MsgAreaTemplateCloseWindow (void);
 
 int UserList_listviewClicked (void);
@@ -140,13 +158,16 @@ int UserSysOpPages_integerClicked (void);
 int UserNetCredit_integerClicked (void);
 int UserTotalCalls_integerClicked (void);
 int UserTotalTime_integerClicked (void);
+
 int FileAreaSelect_buttonClicked (void);
+int File_Area_ManagerCloseWindow (void);
 int MessageAreaSelect_buttonClicked (void);
+int Message_Area_ManagerCloseWindow (void);
 int UserEditorSelect_buttonClicked (void);
+int User_EditorCloseWindow (void);
 int Main_Status_DisplayItem0 (void);
 int Main_Status_DisplayItem1 (void);
-int File_Area_ManagerCloseWindow (void);
-int Message_Area_ManagerCloseWindow (void);
-int User_EditorCloseWindow (void);
-int Main_Status_DisplayCloseWindow (void);
 int About_DLG_EditCloseWindow (void);
+int Main_Status_DisplayCloseWindow (void);
+
+

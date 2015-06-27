@@ -76,34 +76,32 @@
 #define GD_MsgEchomail_check                   7
 #define GD_MsgNetmail_check                    8
 #define GD_MsgUseNet_check                     9
-#define GD_MsgCapacity_slider                  10
-#define GD_MsgRenumber_slider                  11
-#define GD_MsgEnter_low                        12
-#define GD_MsgEnter_high                       13
-#define GD_MsgWrite_low                        14
-#define GD_MsgWrite_high                       15
-#define GD_MsgKill_low                         16
-#define GD_MsgKill_high                        17
-#define GD_MsgForward_low                      18
-#define GD_MsgForward_high                     19
-#define GD_MsgHurl_low                         20
-#define GD_MsgHurl_high                        21
-#define GD_MsgSysOp_low                        22
-#define GD_MsgSysOp_high                       23
-#define GD_MsgReEdit_low                       24
-#define GD_MsgReEdit_high                      25
-#define GD_MsgAreaUp_button                    26
-#define GD_MsgAreaDown_button                  27
-#define GD_MsgAreaSave_button                  28
-#define GD_MsgSaveCharSet_cycle                29
-#define GD_MsgApplyTemplate_button             30
-#define GD_MsgAreaName_string                  31
-#define GD_MsgAreaNumber_integer               32
-#define GD_MsgTranslator_string                33
-#define GD_MsgCapacity_integer                 34
-#define GD_MsgRenumber_integer                 35
-#define GD_MsgCustomOrigin_string              36
-#define GD_MsgImportAreas_button               37
+#define GD_MsgEnter_low                        10
+#define GD_MsgEnter_high                       11
+#define GD_MsgWrite_low                        12
+#define GD_MsgWrite_high                       13
+#define GD_MsgKill_low                         14
+#define GD_MsgKill_high                        15
+#define GD_MsgForward_low                      16
+#define GD_MsgForward_high                     17
+#define GD_MsgHurl_low                         18
+#define GD_MsgHurl_high                        19
+#define GD_MsgSysOp_low                        20
+#define GD_MsgSysOp_high                       21
+#define GD_MsgReEdit_low                       22
+#define GD_MsgReEdit_high                      23
+#define GD_MsgAreaUp_button                    24
+#define GD_MsgAreaDown_button                  25
+#define GD_MsgAreaSave_button                  26
+#define GD_MsgSaveCharSet_cycle                27
+#define GD_MsgApplyTemplate_button             28
+#define GD_MsgAreaName_string                  29
+#define GD_MsgAreaNumber_integer               30
+#define GD_MsgTranslator_string                31
+#define GD_MsgCapacity_integer                 32
+#define GD_MsgRenumber_integer                 33
+#define GD_MsgCustomOrigin_string              34
+#define GD_MsgImportAreas_button               35
 
 #define GDX_MsgArea_listview                   0
 #define GDX_MsgAreaUsers_button                1
@@ -115,34 +113,32 @@
 #define GDX_MsgEchomail_check                  7
 #define GDX_MsgNetmail_check                   8
 #define GDX_MsgUseNet_check                    9
-#define GDX_MsgCapacity_slider                 10
-#define GDX_MsgRenumber_slider                 11
-#define GDX_MsgEnter_low                       12
-#define GDX_MsgEnter_high                      13
-#define GDX_MsgWrite_low                       14
-#define GDX_MsgWrite_high                      15
-#define GDX_MsgKill_low                        16
-#define GDX_MsgKill_high                       17
-#define GDX_MsgForward_low                     18
-#define GDX_MsgForward_high                    19
-#define GDX_MsgHurl_low                        20
-#define GDX_MsgHurl_high                       21
-#define GDX_MsgSysOp_low                       22
-#define GDX_MsgSysOp_high                      23
-#define GDX_MsgReEdit_low                      24
-#define GDX_MsgReEdit_high                     25
-#define GDX_MsgAreaUp_button                   26
-#define GDX_MsgAreaDown_button                 27
-#define GDX_MsgAreaSave_button                 28
-#define GDX_MsgSaveCharSet_cycle               29
-#define GDX_MsgApplyTemplate_button            30
-#define GDX_MsgAreaName_string                 31
-#define GDX_MsgAreaNumber_integer              32
-#define GDX_MsgTranslator_string               33
-#define GDX_MsgCapacity_integer                34
-#define GDX_MsgRenumber_integer                35
-#define GDX_MsgCustomOrigin_string             36
-#define GDX_MsgImportAreas_button              37
+#define GDX_MsgEnter_low                       10
+#define GDX_MsgEnter_high                      11
+#define GDX_MsgWrite_low                       12
+#define GDX_MsgWrite_high                      13
+#define GDX_MsgKill_low                        14
+#define GDX_MsgKill_high                       15
+#define GDX_MsgForward_low                     16
+#define GDX_MsgForward_high                    17
+#define GDX_MsgHurl_low                        18
+#define GDX_MsgHurl_high                       19
+#define GDX_MsgSysOp_low                       20
+#define GDX_MsgSysOp_high                      21
+#define GDX_MsgReEdit_low                      22
+#define GDX_MsgReEdit_high                     23
+#define GDX_MsgAreaUp_button                   24
+#define GDX_MsgAreaDown_button                 25
+#define GDX_MsgAreaSave_button                 26
+#define GDX_MsgSaveCharSet_cycle               27
+#define GDX_MsgApplyTemplate_button            28
+#define GDX_MsgAreaName_string                 29
+#define GDX_MsgAreaNumber_integer              30
+#define GDX_MsgTranslator_string               31
+#define GDX_MsgCapacity_integer                32
+#define GDX_MsgRenumber_integer                33
+#define GDX_MsgCustomOrigin_string             34
+#define GDX_MsgImportAreas_button              35
 
 #define GD_UserList_listview                   0
 #define GD_UserTerminal_cycle                  1
@@ -189,19 +185,14 @@
 #define GD_UserSessionLimit_integer            42
 #define GD_UserTimeUsedToday_integer           43
 #define GD_UserLastFileArea_integer            44
-#define GD_UserFilesUp_integer                 45
-#define GD_UserFilesDown_integer               46
-#define GD_UserKUp_integer                     47
-#define GD_UserKDown_integer                   48
-#define GD_UserPVTLimit_integer                49
-#define GD_UserFileRatio_integer               50
-#define GD_UserLastMsgArea_integer             51
-#define GD_UserMsgsRead_integer                52
-#define GD_UserMsgsWritten_integer             53
-#define GD_UserNetCredit_integer               54
-#define GD_UserTotalTime_integer               55
-#define GD_UserTotalCalls_integer              56
-#define GD_UserSysOpPages_integer              57
+#define GD_UserFileInput_integer               45
+#define GD_UserLastMsgArea_integer             46
+#define GD_UserMsgInput_integer                47
+#define GD_UserTotalTime_integer               48
+#define GD_UserTotalCalls_integer              49
+#define GD_UserSysOpPages_integer              50
+#define GD_UserFileChooser_cycle               51
+#define GD_UserMsgChooser_cycle                52
 
 #define GDX_UserList_listview                  0
 #define GDX_UserTerminal_cycle                 1
@@ -248,19 +239,14 @@
 #define GDX_UserSessionLimit_integer           42
 #define GDX_UserTimeUsedToday_integer          43
 #define GDX_UserLastFileArea_integer           44
-#define GDX_UserFilesUp_integer                45
-#define GDX_UserFilesDown_integer              46
-#define GDX_UserKUp_integer                    47
-#define GDX_UserKDown_integer                  48
-#define GDX_UserPVTLimit_integer               49
-#define GDX_UserFileRatio_integer              50
-#define GDX_UserLastMsgArea_integer            51
-#define GDX_UserMsgsRead_integer               52
-#define GDX_UserMsgsWritten_integer            53
-#define GDX_UserNetCredit_integer              54
-#define GDX_UserTotalTime_integer              55
-#define GDX_UserTotalCalls_integer             56
-#define GDX_UserSysOpPages_integer             57
+#define GDX_UserFileInput_integer              45
+#define GDX_UserLastMsgArea_integer            46
+#define GDX_UserMsgInput_integer               47
+#define GDX_UserTotalTime_integer              48
+#define GDX_UserTotalCalls_integer             49
+#define GDX_UserSysOpPages_integer             50
+#define GDX_UserFileChooser_cycle              51
+#define GDX_UserMsgChooser_cycle               52
 
 #define GD_FileAreaSelect_button               0
 #define GD_MessageAreaSelect_button            1
@@ -271,35 +257,104 @@
 #define GDX_UserEditorSelect_button            2
 
 #define GD_FileTemplateSrc_listview            0
-#define GD_FileTemplateDest_listview           1
+#define GD_FileTemplateTarg_listview           1
 #define GD_FileTemplateApply_button            2
 #define GD_FileTemplateCancel_button           3
-#define GD_FileTemplateConfirmApply_check      4
+#define GD_FileTemplateConfirm_check           4
+#define GD_FileTempAccess_check                5
+#define GD_FileTempUpload_check                6
+#define GD_FileTempDownload_check              7
+#define GD_FileTempTransfer_check              8
+#define GD_FileTempKill_check                  9
+#define GD_FileTempSysop_check                 10
+#define GD_FileTempPath_check                  11
+#define GD_FileTempUsers_check                 12
+#define GD_FileTempFreq_check                  13
+#define GD_FileTempValidation_check            14
+#define GD_FileTempValArea_check               15
 
 #define GDX_FileTemplateSrc_listview           0
-#define GDX_FileTemplateDest_listview          1
+#define GDX_FileTemplateTarg_listview          1
 #define GDX_FileTemplateApply_button           2
 #define GDX_FileTemplateCancel_button          3
-#define GDX_FileTemplateConfirmApply_check     4
+#define GDX_FileTemplateConfirm_check          4
+#define GDX_FileTempAccess_check               5
+#define GDX_FileTempUpload_check               6
+#define GDX_FileTempDownload_check             7
+#define GDX_FileTempTransfer_check             8
+#define GDX_FileTempKill_check                 9
+#define GDX_FileTempSysop_check                10
+#define GDX_FileTempPath_check                 11
+#define GDX_FileTempUsers_check                12
+#define GDX_FileTempFreq_check                 13
+#define GDX_FileTempValidation_check           14
+#define GDX_FileTempValArea_check              15
 
 #define GD_MsgTemplateSrc_listview             0
-#define GD_MsgTemplateDest_listview            1
+#define GD_MsgTemplateTarg_listview            1
 #define GD_MsgTemplateApply_button             2
 #define GD_MsgTemplateCancel_button            3
-#define GD_MsgTemplateConfirmApply_check       4
+#define GD_MsgTemplateConfirm_check            4
+#define GD_MsgTempAccess_check                 5
+#define GD_MsgTempWrite_check                  6
+#define GD_MsgTempForward_check                7
+#define GD_MsgTempCopy_check                   8
+#define GD_MsgTempKill_check                   9
+#define GD_MsgTempReEdit_check                 10
+#define GD_MsgTempSysop_check                  11
+#define GD_MsgTempUsers_check                  12
+#define GD_MsgTempTranslator_check             13
+#define GD_MsgTempCapacity_check               14
+#define GD_MsgTempCharset_check                15
+#define GD_MsgTempMailtype_check               16
+#define GD_MsgTempHandles_check                17
 
 #define GDX_MsgTemplateSrc_listview            0
-#define GDX_MsgTemplateDest_listview           1
+#define GDX_MsgTemplateTarg_listview           1
 #define GDX_MsgTemplateApply_button            2
 #define GDX_MsgTemplateCancel_button           3
-#define GDX_MsgTemplateConfirmApply_check      4
+#define GDX_MsgTemplateConfirm_check           4
+#define GDX_MsgTempAccess_check                5
+#define GDX_MsgTempWrite_check                 6
+#define GDX_MsgTempForward_check               7
+#define GDX_MsgTempCopy_check                  8
+#define GDX_MsgTempKill_check                  9
+#define GDX_MsgTempReEdit_check                10
+#define GDX_MsgTempSysop_check                 11
+#define GDX_MsgTempUsers_check                 12
+#define GDX_MsgTempTranslator_check            13
+#define GDX_MsgTempCapacity_check              14
+#define GDX_MsgTempCharset_check               15
+#define GDX_MsgTempMailtype_check              16
+#define GDX_MsgTempHandles_check               17
+
+#define GD_FileAccessUserSrc_listview          0
+#define GD_FileAccessUserTarg_listview         1
+#define GD_FileAccessAreaSrc_listview          2
+#define GD_FileAccessAreaTarg_listview         3
+#define GD_FileAccessBegin_button              4
+#define GD_FileAccessCancel_button             5
+#define GD_FileAccessUsers_text                6
+#define GD_FileAccessAreas_text                7
+#define GD_FileUserAccessMX                    8
+
+#define GDX_FileAccessUserSrc_listview         0
+#define GDX_FileAccessUserTarg_listview        1
+#define GDX_FileAccessAreaSrc_listview         2
+#define GDX_FileAccessAreaTarg_listview        3
+#define GDX_FileAccessBegin_button             4
+#define GDX_FileAccessCancel_button            5
+#define GDX_FileAccessUsers_text               6
+#define GDX_FileAccessAreas_text               7
+#define GDX_FileUserAccessMX                   8
 
 #define File_Area_Manager_CNT 28
-#define Message_Area_Manager_CNT 38
-#define User_Editor_CNT 58
+#define Message_Area_Manager_CNT 36
+#define User_Editor_CNT 53
 #define Main_Status_Display_CNT 3
-#define FileAreaTemplate_CNT 5
-#define MsgAreaTemplate_CNT 5
+#define FileAreaTemplate_CNT 16
+#define MsgAreaTemplate_CNT 18
+#define FileUserAccess_CNT 9
 
 extern struct IntuitionBase *IntuitionBase;
 extern struct Library       *GadToolsBase;
@@ -313,12 +368,14 @@ extern struct Window        *User_EditorWnd;
 extern struct Window        *Main_Status_DisplayWnd;
 extern struct Window        *FileAreaTemplateWnd;
 extern struct Window        *MsgAreaTemplateWnd;
+extern struct Window        *FileUserAccessWnd;
 extern struct Gadget        *File_Area_ManagerGList;
 extern struct Gadget        *Message_Area_ManagerGList;
 extern struct Gadget        *User_EditorGList;
 extern struct Gadget        *Main_Status_DisplayGList;
 extern struct Gadget        *FileAreaTemplateGList;
 extern struct Gadget        *MsgAreaTemplateGList;
+extern struct Gadget        *FileUserAccessGList;
 extern struct Menu          *Main_Status_DisplayMenus;
 extern struct IntuiMessage   File_Area_ManagerMsg;
 extern struct IntuiMessage   Message_Area_ManagerMsg;
@@ -326,12 +383,14 @@ extern struct IntuiMessage   User_EditorMsg;
 extern struct IntuiMessage   Main_Status_DisplayMsg;
 extern struct IntuiMessage   FileAreaTemplateMsg;
 extern struct IntuiMessage   MsgAreaTemplateMsg;
+extern struct IntuiMessage   FileUserAccessMsg;
 extern struct Gadget        *File_Area_ManagerGadgets[28];
-extern struct Gadget        *Message_Area_ManagerGadgets[38];
-extern struct Gadget        *User_EditorGadgets[58];
+extern struct Gadget        *Message_Area_ManagerGadgets[36];
+extern struct Gadget        *User_EditorGadgets[53];
 extern struct Gadget        *Main_Status_DisplayGadgets[3];
-extern struct Gadget        *FileAreaTemplateGadgets[5];
-extern struct Gadget        *MsgAreaTemplateGadgets[5];
+extern struct Gadget        *FileAreaTemplateGadgets[16];
+extern struct Gadget        *MsgAreaTemplateGadgets[18];
+extern struct Gadget        *FileUserAccessGadgets[9];
 extern UWORD                 File_Area_ManagerLeft;
 extern UWORD                 File_Area_ManagerTop;
 extern UWORD                 File_Area_ManagerWidth;
@@ -356,22 +415,20 @@ extern UWORD                 MsgAreaTemplateLeft;
 extern UWORD                 MsgAreaTemplateTop;
 extern UWORD                 MsgAreaTemplateWidth;
 extern UWORD                 MsgAreaTemplateHeight;
+extern UWORD                 FileUserAccessLeft;
+extern UWORD                 FileUserAccessTop;
+extern UWORD                 FileUserAccessWidth;
+extern UWORD                 FileUserAccessHeight;
 extern UBYTE                *File_Area_ManagerWdt;
 extern UBYTE                *Message_Area_ManagerWdt;
 extern UBYTE                *User_EditorWdt;
 extern UBYTE                *Main_Status_DisplayWdt;
 extern UBYTE                *FileAreaTemplateWdt;
 extern UBYTE                *MsgAreaTemplateWdt;
+extern UBYTE                *FileUserAccessWdt;
 extern struct TextAttr      *Font, Attr;
 extern UWORD                 FontX, FontY;
 extern UWORD                 OffX, OffY;
-extern struct TextFont      *File_Area_ManagerFont;
-extern struct TextFont      *Message_Area_ManagerFont;
-extern struct TextFont      *User_EditorFont;
-extern struct TextFont      *Main_Status_DisplayFont;
-extern struct TextFont      *FileAreaTemplateFont;
-extern struct TextFont      *MsgAreaTemplateFont;
-extern struct GfxBase       *GfxBase;
 extern UBYTE                *FileEnter_low0Labels[];
 extern UBYTE                *FileEnter_high0Labels[];
 extern UBYTE                *FileKill_low0Labels[];
@@ -410,10 +467,15 @@ extern UBYTE                *UserArchiver_cycle2Labels[];
 extern UBYTE                *UserNetmailPriv_cycle2Labels[];
 extern UBYTE                *UserMenuSet_cycle2Labels[];
 extern UBYTE                *UserUUCPPriv_cycle2Labels[];
+extern UBYTE                *UserFileChooser_cycle2Labels[];
+extern UBYTE                *UserMsgChooser_cycle2Labels[];
+extern UBYTE                *FileUserAccessMX6Labels[];
+extern struct MinList        FileArea_listview0List;
+extern struct MinList        UserList_listview2List;
+extern struct MinList        FileAccessUserSrc_listview6List;
+extern struct MinList        FileAccessAreaSrc_listview6List;
 extern struct IntuiText      User_EditorIText[];
 extern struct IntuiText      Main_Status_DisplayIText[];
-extern struct IntuiText      FileAreaTemplateIText[];
-extern struct IntuiText      MsgAreaTemplateIText[];
 extern struct NewMenu        Main_Status_DisplayNewMenu[];
 extern UWORD                 File_Area_ManagerGTypes[];
 extern UWORD                 Message_Area_ManagerGTypes[];
@@ -421,18 +483,21 @@ extern UWORD                 User_EditorGTypes[];
 extern UWORD                 Main_Status_DisplayGTypes[];
 extern UWORD                 FileAreaTemplateGTypes[];
 extern UWORD                 MsgAreaTemplateGTypes[];
+extern UWORD                 FileUserAccessGTypes[];
 extern struct NewGadget      File_Area_ManagerNGad[];
 extern struct NewGadget      Message_Area_ManagerNGad[];
 extern struct NewGadget      User_EditorNGad[];
 extern struct NewGadget      Main_Status_DisplayNGad[];
 extern struct NewGadget      FileAreaTemplateNGad[];
 extern struct NewGadget      MsgAreaTemplateNGad[];
+extern struct NewGadget      FileUserAccessNGad[];
 extern ULONG                 File_Area_ManagerGTags[];
 extern ULONG                 Message_Area_ManagerGTags[];
 extern ULONG                 User_EditorGTags[];
 extern ULONG                 Main_Status_DisplayGTags[];
 extern ULONG                 FileAreaTemplateGTags[];
 extern ULONG                 MsgAreaTemplateGTags[];
+extern ULONG                 FileUserAccessGTags[];
 
 extern int FileArea_listviewClicked( void );
 extern int FileAreaUsers_buttonClicked( void );
@@ -472,8 +537,6 @@ extern int MsgSignatures_checkClicked( void );
 extern int MsgEchomail_checkClicked( void );
 extern int MsgNetmail_checkClicked( void );
 extern int MsgUseNet_checkClicked( void );
-extern int MsgCapacity_sliderClicked( void );
-extern int MsgRenumber_sliderClicked( void );
 extern int MsgEnter_lowClicked( void );
 extern int MsgEnter_highClicked( void );
 extern int MsgWrite_lowClicked( void );
@@ -545,32 +608,58 @@ extern int UserDailyLimit_integerClicked( void );
 extern int UserSessionLimit_integerClicked( void );
 extern int UserTimeUsedToday_integerClicked( void );
 extern int UserLastFileArea_integerClicked( void );
-extern int UserFilesUp_integerClicked( void );
-extern int UserFilesDown_integerClicked( void );
-extern int UserKUp_integerClicked( void );
-extern int UserKDown_integerClicked( void );
-extern int UserPVTLimit_integerClicked( void );
-extern int UserFileRatio_integerClicked( void );
+extern int UserFileInput_integerClicked( void );
 extern int UserLastMsgArea_integerClicked( void );
-extern int UserMsgsRead_integerClicked( void );
-extern int UserMsgsWritten_integerClicked( void );
-extern int UserNetCredit_integerClicked( void );
+extern int UserMsgInput_integerClicked( void );
 extern int UserTotalTime_integerClicked( void );
 extern int UserTotalCalls_integerClicked( void );
 extern int UserSysOpPages_integerClicked( void );
+extern int UserFileChooser_cycleClicked( void );
+extern int UserMsgChooser_cycleClicked( void );
 extern int FileAreaSelect_buttonClicked( void );
 extern int MessageAreaSelect_buttonClicked( void );
 extern int UserEditorSelect_buttonClicked( void );
 extern int FileTemplateSrc_listviewClicked( void );
-extern int FileTemplateDest_listviewClicked( void );
+extern int FileTemplateTarg_listviewClicked( void );
 extern int FileTemplateApply_buttonClicked( void );
 extern int FileTemplateCancel_buttonClicked( void );
-extern int FileTemplateConfirmApply_checkClicked( void );
+extern int FileTemplateConfirm_checkClicked( void );
+extern int FileTempAccess_checkClicked( void );
+extern int FileTempUpload_checkClicked( void );
+extern int FileTempDownload_checkClicked( void );
+extern int FileTempTransfer_checkClicked( void );
+extern int FileTempKill_checkClicked( void );
+extern int FileTempSysop_checkClicked( void );
+extern int FileTempPath_checkClicked( void );
+extern int FileTempUsers_checkClicked( void );
+extern int FileTempFreq_checkClicked( void );
+extern int FileTempValidation_checkClicked( void );
+extern int FileTempValArea_checkClicked( void );
 extern int MsgTemplateSrc_listviewClicked( void );
-extern int MsgTemplateDest_listviewClicked( void );
+extern int MsgTemplateTarg_listviewClicked( void );
 extern int MsgTemplateApply_buttonClicked( void );
 extern int MsgTemplateCancel_buttonClicked( void );
-extern int MsgTemplateConfirmApply_checkClicked( void );
+extern int MsgTemplateConfirm_checkClicked( void );
+extern int MsgTempAccess_checkClicked( void );
+extern int MsgTempWrite_checkClicked( void );
+extern int MsgTempForward_checkClicked( void );
+extern int MsgTempCopy_checkClicked( void );
+extern int MsgTempKill_checkClicked( void );
+extern int MsgTempReEdit_checkClicked( void );
+extern int MsgTempSysop_checkClicked( void );
+extern int MsgTempUsers_checkClicked( void );
+extern int MsgTempTranslator_checkClicked( void );
+extern int MsgTempCapacity_checkClicked( void );
+extern int MsgTempCharset_checkClicked( void );
+extern int MsgTempMailtype_checkClicked( void );
+extern int MsgTempHandles_checkClicked( void );
+extern int FileAccessUserSrc_listviewClicked( void );
+extern int FileAccessUserTarg_listviewClicked( void );
+extern int FileAccessAreaSrc_listviewClicked( void );
+extern int FileAccessAreaTarg_listviewClicked( void );
+extern int FileAccessBegin_buttonClicked( void );
+extern int FileAccessCancel_buttonClicked( void );
+extern int FileUserAccessMXClicked( void );
 extern int Main_Status_DisplayItem0( void );
 extern int Main_Status_DisplayItem1( void );
 
@@ -578,33 +667,38 @@ extern int SetupScreen( void );
 extern void CloseDownScreen( void );
 extern void File_Area_ManagerRender( void );
 extern int HandleFile_Area_ManagerIDCMP( void );
-extern int File_Area_ManagerCloseWindow();
-extern int File_Area_ManagerRawKey();
+extern int File_Area_ManagerCloseWindow( void );
+extern int File_Area_ManagerRawKey( void );
 extern int OpenFile_Area_ManagerWindow( void );
 extern void CloseFile_Area_ManagerWindow( void );
 extern void Message_Area_ManagerRender( void );
 extern int HandleMessage_Area_ManagerIDCMP( void );
-extern int Message_Area_ManagerCloseWindow();
-extern int Message_Area_ManagerRawKey();
+extern int Message_Area_ManagerCloseWindow( void );
+extern int Message_Area_ManagerRawKey( void );
 extern int OpenMessage_Area_ManagerWindow( void );
 extern void CloseMessage_Area_ManagerWindow( void );
 extern void User_EditorRender( void );
 extern int HandleUser_EditorIDCMP( void );
-extern int User_EditorCloseWindow();
+extern int User_EditorCloseWindow( void );
 extern int OpenUser_EditorWindow( void );
 extern void CloseUser_EditorWindow( void );
 extern void Main_Status_DisplayRender( void );
 extern int HandleMain_Status_DisplayIDCMP( void );
-extern int Main_Status_DisplayCloseWindow();
+extern int Main_Status_DisplayCloseWindow( void );
 extern int OpenMain_Status_DisplayWindow( void );
 extern void CloseMain_Status_DisplayWindow( void );
 extern void FileAreaTemplateRender( void );
 extern int HandleFileAreaTemplateIDCMP( void );
-extern int FileAreaTemplateCloseWindow();
+extern int FileAreaTemplateCloseWindow( void );
 extern int OpenFileAreaTemplateWindow( void );
 extern void CloseFileAreaTemplateWindow( void );
 extern void MsgAreaTemplateRender( void );
 extern int HandleMsgAreaTemplateIDCMP( void );
-extern int MsgAreaTemplateCloseWindow();
+extern int MsgAreaTemplateCloseWindow( void );
 extern int OpenMsgAreaTemplateWindow( void );
 extern void CloseMsgAreaTemplateWindow( void );
+extern void FileUserAccessRender( void );
+extern int HandleFileUserAccessIDCMP( void );
+extern int FileUserAccessCloseWindow( void );
+extern int OpenFileUserAccessWindow( void );
+extern void CloseFileUserAccessWindow( void );

@@ -1,0 +1,9 @@
+FROM LIB:c.o "DLG-Edit_GUI.o"+"DLG-Edit.o"+"IDCMP_DLG-Edit.o"+"IDCMP_FileAreaManager.o"+"IDCMP_FileAreaTemplate.o"+"IDCMP_UserEditor.o"+"IDCMP_MsgAreaManager.o"+"IDCMP_MsgAreaTemplate.o"+"IDCMP_FileAccess.o"+"func_Config.o"+"func_Memory.o"
+TO "DLG-Edit"
+LIB LIB:sc.lib LIB:amiga.lib
+ADDSYM
+DEFINE __CXM33=__UCXM33
+DEFINE __CXD33=__UCXD33
+DEFINE __CXM22=__UCXM22
+DEFINE __CXD22=__UCXD22
+
