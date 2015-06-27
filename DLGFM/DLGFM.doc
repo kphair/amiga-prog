@@ -1,0 +1,83 @@
+
+                           DLGFM 0.96 beta.
+                           (Bugfix release)
+
+                         © 1994 Kevin J Phair
+
+                         Freely Distributable
+
+
+A little program to help manage DLG file areas more efficiently.
+
+To use this program just enter DLGFM at a CLI prompt, it will  present
+you with the syntax and options it takes...
+
+    Usage: DLGFM Area [options]
+
+    Options: LIST    File list of area (Number, Filename, Uploader)
+             REBUILD Rebuild file.dat from existing .fd files
+             KILLFD  Kill orphaned .fd files
+             COMMENT Save file description into file comment
+             ACCESS  List users with access to area
+             FALIAS  Set all uploader names in area to aliases
+
+
+Description of options:
+
+    LIST:
+
+        Lists all the files in the file area by number, listing
+        the file name and the uploader beside it.
+
+    REBUILD:
+
+        This will rebuild the "file.dat" file in the area
+        (useful for when it gets damaged, this used to happen a
+        lot, and users would get rubbish displayed on their
+        terminal when doing a quick file list.)
+
+    KILLFD:
+
+        This will scan the area and remove any .fd files for
+        which there is no corresponding file. This is handy if
+        you have done area maintenance using something like
+        Directory Opus.
+
+    COMMENT:
+
+        This will scan the area and put the first 80 characters
+        of a file's description into the file comment field.
+        This can be useful if you archive the area and then use
+        a 'turbo upload'-style option on another BBS system, or
+        if the .fd file goes walkabout and you want to rebuild a
+        basic description file.
+
+    ACCESS:
+
+        Lists all users who access the file area.
+
+    FALIAS:
+
+        Converts all user names in file descriptions to the user
+        alias.
+
+
+You will notice there's another option called  TOUCH  but  that's  not
+written  yet.  What  it  will do is to set the date and time of a file
+according to the fields in the .fd file.
+
+
+Multiple options can be specified, for example:
+
+    DLGFM 10 KILLFD REBUILD COMMENT FALIAS LIST
+
+Options are processed in sequential order.
+
+
+Any suggestions for more options are welcome.
+
+
+Kevin Phair:    Fidonet  2:263/150.6
+                Internet Kevin_Phair@nemesis.ie
+                Internet Kevin_Phair@nemesis.internet-eireann.ie
+

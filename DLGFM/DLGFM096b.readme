@@ -1,0 +1,14 @@
+Short: Util to help maintain DLG file areas (bugfix)
+Uploader: Kevin_Phair@nemesis.ie (Kevin Phair)
+Author: Kevin_Phair@nemesis.ie (Kevin Phair)
+Type: comm/dlg
+
+This little CLI utility allows you to list files in an area, list users
+with access to an area, kill orphaned .fd files in an area, rebuild the
+QuickFile listing etc.
+
+This fixes a silly bug that was in version 0.95 where a rebuilt quick
+file listing (file.dat) did not have the description and filename
+strings terminated if they happened to overrun. This confused DLG and
+made it fall over in all sorts of ways when a quick file listing was
+requested... Thanks to Sean Clarke for bring it to my attention.

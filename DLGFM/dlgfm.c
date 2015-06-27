@@ -1,45 +1,25 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <libraries/dos.h>
-#include <dos.h>
+#include <ctype.h>
 #include <clib/dos_protos.h>
+#include <dlg/dlg.h>
+
+const char version[]="\0$VER: DLGFM 0.96 (18.11.94)";
 
 /// Structures
 
-    struct File_Header {
-        char    From[36];           /* The user who uploaded the file */
-        char    Filename[36];       /* Filename of the file this is describing */
-        char    Date[20];           /* Text string of the date the file was uploaded */
-        SHORT   Times_Downloaded;   /* Number of downloads the file has had */
-        long    Size;               /* Size of the file in bytes */
-        SHORT   Attribute;          /* See attributes below */
-        char    Desc[10000];
-    };
-    struct File_Header fdstruct;
-
-    // Flags for the attribute field of the file header
-    #define NORATIO   1         /* No file ratio will be imposed on this file */
-    #define UNVALIDATED 2       /* This is an unvalidated file */
-
-    /* Quick file index
-
-     The following structure must be written 'alphabetically on the first field'
-     into an index file called 'file.dat' in each public file area when a file is
-     added.  Also must be deleted when the file is removed.  Applicable fields
-     must also be modified in the index file when the filename, size, date, or
-     description changes.
-
-     All utilities that place a file into a public file area must be modified to
-     update this file. (Private files need not worry about this index file).
-    */
-    struct QuickFile {
+    struct  newFile_Header {
+        char    From[36];
         char    Filename[36];
-        long    Date;         /* number of seconds since Jan 1, 1978 */
-        SHORT   Number;       /* File number (.fd file number)*/
-        long    Size;         /* size of file in bytes */
-        char    Desc[60];     /* 60 character of the description */
+        char    Date[20];
+        SHORT   Times_Downloaded;
+        long    Size;
+        SHORT   Attribute;
+        char    Body[20000];
     };
+    struct newFile_Header fdstruct;
+
     struct QuickFile fbstruct;
 
     struct FileUsersStruct {
@@ -57,11 +37,11 @@ char searchpath[60]={0};
 
     int  file_area=0,
          user_area=0,
-         list_area=0,
          reportlevel=0,
+         low_pointer=0,
+         high_pointer=0,
+         fd_filesize=0,
          filenumber=1;
-
-    char current_dir[255];
 
     FILE *fd_handle,
          *fu_handle,
@@ -77,10 +57,11 @@ char searchpath[60]={0};
     void list_users(void);
     void touch_files(void);
     void kill_orphans(void);
-    void cd_area(int);
+    void file_aliases(void);
+    int  GetFilePointers(void);
     int  read_fd(int);
     int  kill_fd(int);
-    void fatal_error(char *);
+    int  write_fd(int);
 
 ///
 
@@ -100,11 +81,6 @@ void main(argc,argv) int argc; char *argv[]; {
         // If command line arguments are provided then do stuff
 
         file_area=atoi(argv[1]);
-        if (getcd(0,current_dir)) {
-            printf("FATAL ERROR retrieving current directory");
-            exit(1);
-        }
-        cd_area(file_area);
 
         // Scan argument list for valid options and do them sequentially
 
@@ -112,31 +88,14 @@ void main(argc,argv) int argc; char *argv[]; {
 
             strupr(argv[c_arg]);
 
-            if (!strcmp(argv[c_arg],"LIST")) {
-                short_listing();
-                break;
-            }
-            if (!strcmp(argv[c_arg],"REBUILD")) {
-                rebuild_file();
-                break;
-            }
-            if (!strcmp(argv[c_arg],"KILLFD")) {
-                kill_orphans();
-                break;
-            }
-            if (!strcmp(argv[c_arg],"TOUCH")) {
-                touch_files();
-                break;
-            }
-            if (!strcmp(argv[c_arg],"COMMENT")) {
-                save_fd2comment();
-                break;
-            }
-            if (!strcmp(argv[c_arg],"ACCESS")) {
-                list_users();
-                break;
-            }
-            mystery_arg=1;
+            if      (!strcmp(argv[c_arg],"LIST"))     short_listing();
+            else if (!strcmp(argv[c_arg],"REBUILD"))  rebuild_file();
+            else if (!strcmp(argv[c_arg],"KILLFD"))   kill_orphans();
+            else if (!strcmp(argv[c_arg],"TOUCH"))    touch_files();
+            else if (!strcmp(argv[c_arg],"COMMENT"))  save_fd2comment();
+            else if (!strcmp(argv[c_arg],"ACCESS"))   list_users();
+            else if (!strcmp(argv[c_arg],"FALIAS"))   file_aliases();
+            else mystery_arg=1;
         };
         if (mystery_arg) {
             printf("\n");
@@ -144,13 +103,12 @@ void main(argc,argv) int argc; char *argv[]; {
             printf("Enter %s without any arguments for help.\n",argv[0]);
             printf("\n");
         }
-        chdir(current_dir);
     } else {
 
         // No arguments, give help
 
         printf("\n");
-        printf("DLG File Manager 0.91b © 1994 Kevin Phair (FIDONET 2:263/150.6)\n");
+        printf("DLG File Manager 0.96b © 1994 Kevin Phair (FIDONET 2:263/150.6)\n");
         printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
         printf("Usage: %s Area [options]\n\n",argv[0]);
 
@@ -160,24 +118,44 @@ void main(argc,argv) int argc; char *argv[]; {
         printf("         TOUCH   Date-stamp files using date in .fd\n");
         printf("         COMMENT Save file description into file comment\n");
         printf("         ACCESS  List users with access to area\n");
+        printf("         FALIAS  Set all uploader names in area to aliases\n");
         printf("\n");
         printf("Options take effect in the order they are entered.\n");
         printf("\n");
     }
+    exit(0);
 }
 
+/// GET FILE POINTERS
 
+    int GetFilePointers(void) {
+
+        char *filename="FILE:9999/Pointers.file";
+        FILE *pointer_file;
+
+        sprintf(filename,"FILE:%d/Pointers.file",file_area);
+        if (pointer_file=fopen(filename,"rt")) {
+            fscanf(pointer_file,"%d\n%d",&low_pointer,&high_pointer);
+            fclose(pointer_file);
+            return(1);
+        } else return(0);
+    }
+
+///
 /// SHORT FILE LISTING
 
     void short_listing() {
 
-        printf("SHORT LISTING OF FILES IN AREA: %d\n",file_area);
-        printf("-------------------------------------\n");
+        printf("SHORT LISTING OF FILES IN AREA: %4d\n",file_area);
+        printf("------------------------------------\n");
 
-        filenumber=1;
+        GetFilePointers();
 
-        while (read_fd(filenumber))
-            printf("File: %5d : %-30.30s %.30s\n", filenumber++, fdstruct.Filename, fdstruct.From);
+        for (filenumber=low_pointer; filenumber<=high_pointer; filenumber++) {
+            if (read_fd(filenumber)) {
+                printf("File: %4d : %-30.30s %.30s\n", filenumber, fdstruct.Filename, fdstruct.From);
+            }
+        }
     }
 
 ///
@@ -185,35 +163,40 @@ void main(argc,argv) int argc; char *argv[]; {
 
     void rebuild_file() {
 
-        if (fb_handle=fopen("file.dat","wb")) {
+        char *FileDatName="FILE:9999/file.dat";
 
-            filenumber=1;
-            while (read_fd(filenumber)) {
+        printf("REBUILDING QUICK LISTING FOR AREA: %4d\n",file_area);
+        printf("---------------------------------------\n");
 
-                printf("Rebuilding from file: %5d : %-30.30s\r",
-                    filenumber,fdstruct.Filename);
+        sprintf(FileDatName,"FILE:%d/file.dat",file_area);
+        if (fb_handle=fopen(FileDatName,"wb")) {
 
-                setmem(&fbstruct,sizeof(fbstruct),0);
-                fbstruct.Number=filenumber;
-                fbstruct.Size=fdstruct.Size;
-                memcpy(fbstruct.Filename,fdstruct.Filename,36);
-                memcpy(fbstruct.Desc,fdstruct.Desc,    60);
+            GetFilePointers();
 
-                fwrite(&fbstruct,sizeof(fbstruct),1,fb_handle);
+            for (filenumber=low_pointer; filenumber<=high_pointer; filenumber++) {
+                if (read_fd(filenumber)) {
 
-                filenumber++;
+                    printf("Rebuilding from file: %5d : %-30.30s\r",
+                        filenumber,fdstruct.Filename);
+
+                    setmem(&fbstruct,sizeof(fbstruct),0);
+                    fbstruct.number=filenumber;
+                    fbstruct.size=fdstruct.Size;
+                    strncpy(fbstruct.filename,fdstruct.Filename,35);
+                    strncpy(fbstruct.desc,fdstruct.Body, 59);
+
+                    fwrite(&fbstruct,sizeof(fbstruct),1,fb_handle);
+                }
             }
             fclose(fb_handle);
 
-            /* Create new pointer settings */
-            fb_handle=fopen("Pointers.file","wt");
-            fprintf(fb_handle,"1\x0a%d\x0a",filenumber-1);
-            fclose(fb_handle);
-
             /* Done! */
-            printf("\nFile area %d rebuilt.\n\n",list_area);
+            printf("\nFile area %d rebuilt.\n\n",file_area);
 
-        } else fatal_error("FATAL ERROR creating file.dat\n\n");
+        } else {
+            printf("FATAL ERROR creating FILE:%d/file.dat\n\n",file_area);
+            exit(30);
+        }
     }
 
 ///
@@ -222,29 +205,37 @@ void main(argc,argv) int argc; char *argv[]; {
     void save_fd2comment() {
 
         char newcomment[116];
+        char *Archivename="FILE:9999/123456789012345678901234567890";
         char *commentsrc;
         char *commentptr;
         int i;
 
-        filenumber=1;
-        while (read_fd(filenumber)) {
+        printf("SAVING DESCRIPTIONS INTO FILE COMMENT FOR AREA: %4d\n",file_area);
+        printf("----------------------------------------------------\n");
 
-            /* Move file description into file's comment */
-            commentptr=newcomment;
-            commentsrc=fdstruct.Desc;
+        GetFilePointers();
 
-            /* Do it byte by byte to weed out strange characters */
-            for (i=0;i<79;i++) {
-                *commentptr=*commentsrc;
-                *(commentptr+1)=0;
-                if (*commentptr==0) break;
-                if (*commentptr<32) *commentptr=32;
-                ++commentptr;commentsrc++;
+        for (filenumber=low_pointer; filenumber<=high_pointer; filenumber++) {
+            if (read_fd(filenumber)) {
+
+                /* Move file description into file's comment */
+                commentptr=newcomment;
+                commentsrc=fdstruct.Body;
+
+                /* Do it byte by byte to weed out strange characters */
+                for (i=0;i<79;i++) {
+                    *commentptr=*commentsrc;
+                    *(commentptr+1)=0;
+                    if (*commentptr==0) break;
+                    if (*commentptr<32) *commentptr=32;
+                    ++commentptr;commentsrc++;
+                }
+
+                sprintf(Archivename,"FILE:%d/%s",file_area,fdstruct.Filename);
+                SetComment(Archivename, newcomment);
+
+                printf("Commented file %d (%.30s) as %.30s...\n", filenumber, fdstruct.Filename, newcomment);
             }
-          
-            SetComment(fdstruct.Filename, newcomment);
-
-            printf("Commented file %d (%.30s) as %.30s...\n", filenumber++, fdstruct.Filename, newcomment);
         }
     }
 
@@ -252,27 +243,25 @@ void main(argc,argv) int argc; char *argv[]; {
 /// LIST USERS WITH ACCESS TO FILE AREA
 
     void list_users() {
+        char *userfile="FILE:9999/User.file";
 
-        printf("LISTING OF USERS WITH ACCESS TO FILE AREA: %d\n",file_area);
-        printf("------------------------------------------------\n");
+        printf("LISTING OF USERS WITH ACCESS TO FILE AREA: %4d\n",file_area);
+        printf("-----------------------------------------------\n");
 
         /* Open user access data file */
-        fu_handle=fopen("user.file","rb");
-
-        while (fread(&fustruct,sizeof(fustruct),1,fu_handle)) {
-            printf("%.30s\n",fustruct.User);
+        sprintf(userfile,"FILE:%d/User.file",file_area);
+        if (fu_handle=fopen(userfile,"rb")) {
+            while (fread(&fustruct,sizeof(fustruct),1,fu_handle)) printf("%.30s\n",fustruct.User);
+            fclose(fu_handle);
         }
-
-        fclose(fu_handle);
     }
 
 ///
 /// TOUCH FILE DATE AND TIME USING .FD
 
     void touch_files() {
-        printf("RESETTING FILE DATES AND TIMES IN FILE AREA: %d\n",file_area);
-        printf("- Not implemented yet ----------------------------\n");
-        printf("--------------------------------------------------\n");
+        printf("RESETTING FILE DATES AND TIMES IN FILE AREA: %4d\n",file_area);
+        printf("-------------------------------------------------\n");
     }
 
 ///
@@ -280,55 +269,89 @@ void main(argc,argv) int argc; char *argv[]; {
 
     void kill_orphans() {
         FILE *tempfile;
+        char *Archivename="FILE:9999/123456789012345678901234567890";
 
-        printf("KILLING ORPHANED .FD FILES IN FILE AREA %d\n",file_area);
+        printf("KILLING ORPHANED .FD FILES IN FILE AREA: %4d\n",file_area);
+        printf("---------------------------------------------\n");
 
-        filenumber=1;
-        while(read_fd(filenumber)) {
 
-            if (tempfile=fopen(fdstruct.Filename,"rb"))
-                printf("%d.fd has matching file\r",filenumber);
-            else {
-                fclose(tempfile);
-                printf("Found orphan: %d.fd, killing it... ",filenumber);
-                if (kill_fd(filenumber)) 
-                    printf("ERROR!\n"); 
-                else 
-                    printf("OK\n");
+        GetFilePointers();
+
+        for (filenumber=low_pointer; filenumber<=high_pointer; filenumber++) {
+            if (read_fd(filenumber)) {
+                sprintf(Archivename,"FILE:%d/%s",file_area,fdstruct.Filename);
+                if (tempfile=fopen(Archivename,"rb")) {
+                    fclose(tempfile);
+                } else {
+                    printf("Found orphan: %d.fd, killing it... ",filenumber);
+                    if (kill_fd(filenumber))
+                        printf("ERROR!\n");
+                    else
+                        printf("Done\n");
+                }
             }
-            filenumber++;
         }
         printf("\n");
     }
 ///
+/// CHANGE USER NAMES TO ALIASES
 
-/// Change directory to a file area
+    void file_aliases() {
 
-    void cd_area(int area) {
-        char area_path[16];
+        char *UserFile="USER:123456789012345678901234567890/user.data";
+        struct USER_DATA UserData;
+        int i;
+        FILE *userfile;
 
-        setmem(area_path,sizeof(area_path),0);
-        strcpy(area_path,"File:");
+        printf("CHANGING USER NAMES TO ALIASES IN AREA: %4d\n",file_area);
+        printf("--------------------------------------------\n");
 
-        stci_d((area_path+5),area);
+        GetFilePointers();
 
-        if(chdir(area_path))
-            fatal_error("FATAL ERROR changing directory to file area.\n");
-
+        for (filenumber=low_pointer; filenumber<=high_pointer; filenumber++) {
+            if (read_fd(filenumber)) {
+                sprintf(UserFile,"USER:%s/user.data",fdstruct.From);
+                for(i=0;i<30;i++) if (UserFile[i]==32) UserFile[i]='_';
+                if (userfile=fopen(UserFile,"rb")) {
+                    setmem(&UserData,sizeof(struct USER_DATA),0);
+                    if (fread(&UserData,sizeof(struct USER_DATA),1,userfile)) {
+                        printf("Changing %s to %s for file %d: %s\n",fdstruct.From,UserData.Alias,filenumber,fdstruct.Filename);
+                        strcpy(fdstruct.From,UserData.Alias);
+                        write_fd(filenumber);
+                    }
+                    fclose(userfile);
+                }
+            }
+        }
     }
 
+///
+/// Write a new description file from buffer
+
+    int write_fd(file) {
+        char *filename="FILE:9999/9999.fd";
+        FILE *fd_file;
+
+        sprintf(filename,"FILE:%d/%d.fd",file_area,file);
+        if (fd_file=fopen(filename,"wb")) {
+            fwrite(&fdstruct,fd_filesize,1,fd_file);
+            fclose(fd_file);
+            return(1);
+        } else return(0);
+    }
 ///
 /// Open a description file and read it into the structure
 
     int read_fd(file) {
-        char filename[16];
+        char *filename="FILE:9999/9999.fd";
         FILE *fd_file;
 
-        setmem(filename,sizeof(filename),0);
-        strcpy((filename+stci_d(filename,file)),".fd");
+        sprintf(filename,"FILE:%d/%d.fd",file_area,file);
+        fd_filesize=0;
         if (fd_file=fopen(filename,"rb")) {
             setmem(&fdstruct,sizeof(fdstruct),0);
             fread(&fdstruct,sizeof(fdstruct),1,fd_file);
+            fd_filesize=ftell(fd_file);
             fclose(fd_file);
             return(1);
         } else return(0);
@@ -337,20 +360,9 @@ void main(argc,argv) int argc; char *argv[]; {
 /// Kill a description file
 
     int kill_fd(file) {
-        char filename[16];
+        char *filename="FILE:9999/9999.fd";
 
-        setmem(filename,sizeof(filename),0);
-        strcpy((filename+stci_d(filename,file)),".fd");
+        sprintf(filename,"FILE:%d/%d.fd",file_area,file);
         return (unlink(filename));
     }
 ///
-/// Exit to DOS with a fatal error string
-
-void fatal_error(char *errstring) {
-
-    printf(errstring);
-    chdir(current_dir);
-    exit(2);
-}
-///
-
